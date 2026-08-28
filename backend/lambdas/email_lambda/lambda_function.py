@@ -11,12 +11,12 @@ def lambda_handler(event, context):
 
     body = json.loads(event['body'])
     # Publish message directly to email, provided by EmailOnly or EmailPar TASK
-    ses.send_email( Source=FROM_EMAIL_ADDRESS,
-        Destination={ 'ToAddresses': [ body['email'] ] }, 
-        Message={ 'Subject': {'Data': 'I got your message!'},
-            'Body': {'Text': {'Data': f"I'll get back to you as soon as possible.\nLook forward to connecting.\n\nYou sent:\n{body['message']}"}}
-        }
-    )
+    # ses.send_email( Source=FROM_EMAIL_ADDRESS,
+    #     Destination={ 'ToAddresses': [ body['email'] ] }, 
+    #     Message={ 'Subject': {'Data': 'I got your message!'},
+    #         'Body': {'Text': {'Data': f"I'll get back to you as soon as possible.\nLook forward to connecting.\n\nYou sent:\n{body['message']}"}}
+    #     }
+    # )
     ses.send_email( Source=FROM_EMAIL_ADDRESS,
         Destination={ 'ToAddresses': [ MY_EMAIL_ADDRESS ] }, 
         Message={ 'Subject': {'Data': f'MSG from {body['email']}'},
