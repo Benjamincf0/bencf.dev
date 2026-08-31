@@ -5,6 +5,7 @@ import Projects from "#components/projects.tsx";
 import ContactForm from "#components/contactme.tsx";
 import Testimonials from "#components/testimonials.tsx"
 import Readings from "#components/readings.tsx"
+import Contributions from "#components/contributions.tsx"
 import "#styles/App.css";
 
 function App() {
@@ -26,6 +27,8 @@ function App() {
         <Projects />
         <h2><span className="hover-line">Recent readings</span></h2>
         <Readings />
+        <h2><span className="hover-line">Open Source Contributions</span></h2>
+        <Contributions />
         <h2><span className="hover-line">Testimonials</span></h2>
         <Testimonials />
       </section>
