@@ -29,6 +29,8 @@ function App() {
         <Readings />
         <h2><span className="hover-line">Open Source Contributions</span></h2>
         <Contributions />
+        <h2><span className="hover-line">Certifications</span></h2>
+        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="587abda5-297e-4788-9d12-9ccd1c568189" data-share-badge-host="https://www.credly.com"></div><script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
         <h2><span className="hover-line">Testimonials</span></h2>
         <Testimonials />
       </section>
