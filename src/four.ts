@@ -200,9 +200,23 @@ export class Mapper {
 
 }
 
+interface ShaderAttribute {
+  name: string,
+  location: GLint
+}
+
+
+interface ShaderUniforms {
+  name: string,
+  location: GLint
+}
+
 export class ShaderProgram {
   fragmentSource: string
   vertexSource: string
+  shader_attributes: Array<ShaderAttribute>
+  shader_uniforms: Array<ShaderUniforms>
+  program: WebGLProgram|null
 
   constructor() {
     this.fragmentSource = `
@@ -253,12 +267,92 @@ void main() {
   gl_Position = pos;
 }
 `
+    this.shader_attributes = [{ name: 'a_position', location: -1 }]
+    this.shader_uniforms = [
+      { name: 'MCDCMatrix', location: -1 }, 
+      { name: 'u_time', location: -1}
+    ]
+    this.program = null;
   }
 
   setup(gl: WebGLRenderingContext) {
-    // create shaders
-    // create program
+    // Create and compile our vertex & fragment shader with webgl.
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, this.vertexSource);
+    const fragmentShader = createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      this.fragmentSource,
+    );
+
+    // Combining and compiling the both shaders into a program.
+    const program = createProgram(gl, vertexShader, fragmentShader);
+    this.program = program
+    
+    // extract attributes
+    this.shader_attributes
+
     // extract uniforms
+    for (let i = 0; i < this.shader_attributes.length; i++) {
+      const name = this.shader_attributes[i].name;
+      const loc = gl.getAttribLocation(
+        program,
+        name,
+      );
+
+      this.shader_attributes[i].location = loc;
+    }
+  }
+
+  render(gl: WebGLRenderingContext, uniforms: Array<ShaderUniforms>) {
+
   }
 
 }
+
+
+
+// WebGL utils
+//
+type WebGLShaderType =
+  | typeof WebGLRenderingContext.FRAGMENT_SHADER
+  | typeof WebGLRenderingContext.VERTEX_SHADER;
+
+function createShader(
+  gl: WebGLRenderingContext,
+  type: WebGLShaderType,
+  shaderSource: string,
+): WebGLShader {
+  var shader = gl.createShader(type);
+  if (!shader) {
+    throw new Error("Something aint right");
+  }
+
+  gl.shaderSource(shader, shaderSource);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const info = gl.getShaderInfoLog(shader);
+    throw new Error(`Could not create shader womp womp. \n\n${info}`);
+  }
+  return shader;
+}
+
+function createProgram(
+  gl: WebGLRenderingContext,
+  vertexShader: WebGLShader,
+  fragmentShader: WebGLShader,
+): WebGLProgram {
+  const program = gl.createProgram();
+
+  // Attach pre-existing shaders
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+
+  gl.linkProgram(program);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    const info = gl.getProgramInfoLog(program);
+    throw new Error(`Could not compile WebGL program. \n\n${info}`);
+  }
+  return program;
+}
+
