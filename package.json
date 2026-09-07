@@ -21,7 +21,7 @@
     "gl-matrix": "^3.4.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "three": "file:../three-dev"
+    "three": "git+https://github.com/mrdoob/three.js.git#dev"
   },
   "devDependencies": {
     "@math.gl/types": "^4.1.0",
