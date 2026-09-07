@@ -3,114 +3,13 @@ import "#styles/hero.css";
 import { load } from "@loaders.gl/core";
 // import { PolyDataMapper, WebGLActor, Camera, WebGLRenderer} from "./../four.ts"
 import statusActiveIcon from "#assets/status-active-svgrepo-com.svg";
-import { PLYLoader } from "@loaders.gl/ply";
-const plyData = await loadPlyBuffer("./bunny.ply");
-import { mat4, vec3 } from "gl-matrix";
-
-const vertexShaderSource = `
-  // This attribute holds the position of my vertex.
-  attribute vec3 a_position;
-
-  uniform float u_time;
-
-  uniform mat4 WCVCMatrix;
-
-  // NOTE: No need to register a varying in javascript, as it is handeled by the glsl shader
-  // compiler and linker.
-
-  // This varying vec3 will hold the position of the vertex, and will be interpolated by the
-  // GPU before being passed to the fragment shader.
-  varying vec3 v_position;
-
-  mat4 getRotationY(float angle) {
-      float s = sin(angle);
-      float c = cos(angle);
-      return mat4(
-            c, 0.0,  -s, 0.0,
-          0.0, 1.0, 0.0, 0.0,
-            s, 0.0,   c, 0.0,
-          0.0, 0.0, 0.0, 1.0
-      );
-  }
- 
-  void main() {
-    vec4 pos = getRotationY(u_time*0.0001)*WCVCMatrix*vec4(a_position, 1.0)*(sin(32.0*asin(a_position.z/length(a_position))+u_time*0.001)*0.02+0.98);
-    v_position = pos.xyz;
-    gl_Position = vec4(pos.xyz*9.0 - vec3(0, 0.9, 0), 1.0);
-  }
-`;
-
-const fragmentShaderSource = `
-  // This macro enables the derivative of the varyings accross adjacent fragments.
-  #extension GL_OES_standard_derivatives : enable
-
-  // fragment shaders don't have a default precision so we need
-  // to pick one. mediump is a good default
-  precision mediump float;
-
-  // This vec3 is passed from the GPU and interpolated.
-  varying vec3 v_position;
-
-  void main() {
-    // Compute the derivative of the v_position accross adjacent fragments.
-    
-    // partial derivative of the position wrt. the horizontal axis of the screen.
-    // Basically saying, how does the (interpolated) position of the vertex vary
-    // in each dimension when we move 1 pixel/fragment to the right.
-    vec3 dx = dFdx(v_position);
-
-    // Same thing but wrt. vertical axis of screen.
-    vec3 dy = dFdy(v_position);
-
-    vec3 normal = normalize(cross(dx, dy));
-    vec3 color = normal * 0.5 + 0.5;
-    
-    gl_FragColor = vec4(color, 1); // return reddish-purple
-  }
-`;
-
-type WebGLShaderType =
-  | typeof WebGLRenderingContext.FRAGMENT_SHADER
-  | typeof WebGLRenderingContext.VERTEX_SHADER;
-
-function createShader(
-  gl: WebGLRenderingContext,
-  type: WebGLShaderType,
-  shaderSource: string,
-): WebGLShader {
-  var shader = gl.createShader(type);
-  if (!shader) {
-    throw new Error("Something aint right");
-  }
-
-  gl.shaderSource(shader, shaderSource);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const info = gl.getShaderInfoLog(shader);
-    throw new Error(`Could not create shader womp womp. \n\n${info}`);
-  }
-  return shader;
-}
-
-function createProgram(
-  gl: WebGLRenderingContext,
-  vertexShader: WebGLShader,
-  fragmentShader: WebGLShader,
-): WebGLProgram {
-  const program = gl.createProgram();
-
-  // Attach pre-existing shaders
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const info = gl.getProgramInfoLog(program);
-    throw new Error(`Could not compile WebGL program. \n\n${info}`);
-  }
-  return program;
-}
+// import { PLYLoader } from "@loaders.gl/ply";
+// const plyData = await loadPlyBuffer("./bunny.ply");
+// import { mat4, vec3 } from "gl-matrix";
+import * as THREE from "three/webgpu";
+import { SPZLoader } from "three/addons/loaders/SPZLoader.js";
+// import { GaussianSplatPLYLoader } from "three/addons/loaders/GaussianSplatPLYLoader.js";
+import { GaussianSplat } from "three/addons/objects/GaussianSplat.js";
 
 function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
   // Lookup the size the browser is displaying the canvas in CSS pixels.
@@ -130,166 +29,113 @@ function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
   return needResize;
 }
 
-async function loadPlyBuffer(url: string) {
-  const data = await load(url, PLYLoader);
-  const vertices = data.attributes.POSITION.value as Float32Array;
+function createTerminal({
+  width = 1024,
+  height = 512,
+  bgColor = '#000000',
+  textColor = '#00ff00',
+  font = '28px "Courier New", monospace',
+  padding = 20,
+  lineHeight = 34
+} = {}) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
 
-  let indices = data.indices?.value;
+  const ctx = canvas.getContext('2d');
+  ctx.font = font;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
 
-  // Force 16-bit array
-  if (indices instanceof Uint32Array) {
-    indices = new Uint16Array(indices);
+  const texture = new THREE.CanvasTexture(canvas);
+  const lines = [];
+
+  function redraw() {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = textColor;
+    lines.forEach((line, i) => {
+      ctx.fillText(line, padding, padding + i * lineHeight);
+    });
+    texture.needsUpdate = true;
   }
 
-  if (!indices) {
-    throw Error(`Failed to load indices from ply.`);
+  function appendLine(text) {
+    lines.push(text);
+    const maxLines = Math.floor((height - padding * 2) / lineHeight);
+    if (lines.length > maxLines) lines.shift(); // drop oldest, keeps it scrolling
+    redraw();
   }
 
-  return { vertices, indices };
+  redraw();
+  return { canvas, texture, appendLine };
 }
-
-let WCVCMatrix = mat4.create();
-mat4.rotateY(WCVCMatrix, WCVCMatrix, 1.14);
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvasContext, setCanvasContext] = useState<string>("");
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   // This function runs after the component renders.
   // It initializes our webgl context, shader program, and positionBuffer.
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const gl = canvas.getContext("webgl");
-    if (!gl) return;
-    else {
-      setCanvasContext("webgl");
-    }
-    if (gl.canvas instanceof OffscreenCanvas) return;
+    (async () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      resizeCanvasToDisplaySize(canvas);
+      const renderer = new THREE.WebGPURenderer({ canvas });
+      await renderer.init();
+      renderer.setPixelRatio(window.devicePixelRatio);
+      // renderer.setSize(window.innerWidth, window.innerHeight);
 
-    gl.getExtension("OES_standard_derivatives");
-    gl.enable(gl.DEPTH_TEST);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        50,
+        window.innerWidth / window.innerHeight,
+        0.01,
+        100,
+      );
+      camera.up.set(0, -1, 0);
 
-    // Create and compile our vertex & fragment shader with webgl.
-    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-    const fragmentShader = createShader(
-      gl,
-      gl.FRAGMENT_SHADER,
-      fragmentShaderSource,
-    );
+      // load splat
+      const splatGeometry = await new SPZLoader().loadAsync("splat(4).spz");
+      const splats = new GaussianSplat(splatGeometry);
+      splats.translateZ(0.1)
+      scene.add(splats);
 
-    // Combining and compiling the both shaders into a program.
-    const program = createProgram(gl, vertexShader, fragmentShader);
+      const curve = new THREE.CatmullRomCurve3(
+        [
+          new THREE.Vector3(0, 2, 2),
+          new THREE.Vector3(0, 1, 0.1),
+          new THREE.Vector3(0, 0.5, 0.01),
+        ],
+        false,
+      ); // true = closed loop
 
-    // We get the location of our vertex shader attribute that is declared in the vertex shader.
-    const positionAttributeLocation = gl.getAttribLocation(
-      program,
-      "a_position",
-    );
+      const clock = new THREE.Clock();
+      const duration = 6; // seconds for one full loop
 
-    // This holds the vertices of the triangles.
-    const positionBuffer = gl.createBuffer();
+      const terminal = createTerminal();
 
-    // This holds the indices of the vertices forming each triangle.
-    const indexBuffer = gl.createBuffer();
+      const geometry = new THREE.PlaneGeometry(0.4, 0.23);
+      const material = new THREE.MeshBasicMaterial({ map: terminal.texture });
+      const screen = new THREE.Mesh(geometry, material);
+      screen.translateZ(0.08);
+      screen.rotation.z = Math.PI;
+      screen.rotation.x = -Math.PI / 2;
+      scene.add(screen);
 
-    // This binds my positionBuffer to the gl.ARRAY_BUFFER bind point.
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      terminal.appendLine('> Welcome to my portfolio website');
+      terminal.appendLine('> Look at my projects!');
 
-    // Now we create a strongly typed array, and copy it to the GPU on the gl.ARRAY_BUFFER bind point.
-    // gl.STATIC_DRAW is a hint to webgl that we won't change this buffer often, so it can optimize things.
-    gl.bufferData(gl.ARRAY_BUFFER, plyData.vertices, gl.STATIC_DRAW);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, plyData.indices, gl.STATIC_DRAW);
-    console.log("testing");
+      renderer.setAnimationLoop(() => {
+        const t = Math.min(clock.getElapsedTime(), duration) / duration; // 0 → 1
+        const pos = curve.getPointAt(1 - (t - 1) ** 4);
+        camera.position.copy(pos);
+        camera.lookAt(0, 0, 0); // or use curve.getTangentAt(t) to look ahead
 
-    const WCVCMatrixUniformLocation = gl.getUniformLocation(
-      program,
-      "WCVCMatrix",
-    );
-    const timeUniformLocation = gl.getUniformLocation(program, "u_time");
-    if (!WCVCMatrixUniformLocation) {
-      throw Error("Couldn't fetch uniform location.");
-    }
-
-    // RENDERING ...
-
-    // This makes sure the canvas pixels match the css pixel dimensions.
-    resizeCanvasToDisplaySize(gl.canvas);
-
-    // Here we're telling webgl what's our canvas dimensions so that it can convert from clip -> screen space.
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    // Clear the canvas
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    // Tell it to use our program (pair of shaders)
-    // NOTE: I think if we had a setup where different objects could draw themselves, we might want to specify the program associated with that object before calling drawElements to allow for different shading of different objects.
-    gl.useProgram(program);
-
-    // Next we tell webgl how to take our position buffer and supply it as the attribute to our vertex shader.
-
-    // Turn on the vertex shader attribute array
-    gl.enableVertexAttribArray(positionAttributeLocation);
-
-    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    var size = 3; // 2 components per iteration
-    var type = gl.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    gl.vertexAttribPointer(
-      positionAttributeLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset,
-    );
-
-    // set the resolution uniform of the fragment shader.
-    gl.uniformMatrix4fv(WCVCMatrixUniformLocation, false, WCVCMatrix);
-    gl.uniform1f(timeUniformLocation, performance.now());
-
-    // Now we tell it to execute finally 😅
-    const primitiveType = gl.TRIANGLES;
-    offset = 0;
-    const count = plyData.indices.length;
-    const indexType = gl.UNSIGNED_SHORT;
-    gl.drawElements(primitiveType, count, indexType, offset);
-    console.log("rendered");
-
-    // Create the observer
-    // const observer = new ResizeObserver();
-
-    // observer.observe(canvas);
-    setInterval(() => {
-      // console.log(WCVCMatrix);
-      if (gl.canvas instanceof OffscreenCanvas) return;
-      resizeCanvasToDisplaySize(gl.canvas);
-
-      // Tell WebGL how to convert from clip space to pixels
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-      // Clear the canvas.
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-      // Tell it to use our program (pair of shaders)
-      gl.useProgram(program);
-
-      gl.uniformMatrix4fv(WCVCMatrixUniformLocation, false, WCVCMatrix);
-      gl.uniform1f(timeUniformLocation, performance.now());
-
-      // Draw the geometry.
-      const primitiveType = gl.TRIANGLES;
-      const offset = 0;
-      const count = plyData.indices.length;
-      const indexType = gl.UNSIGNED_SHORT;
-      gl.drawElements(primitiveType, count, indexType, offset);
-      // console.log("rendered");
-    }, 10);
+        renderer.render(scene, camera);
+      });
+    })();
   }, []); // Only runs once since we pass [] as depsList
 
   let x0 = null;
@@ -326,18 +172,7 @@ export default function Hero() {
 
   return (
     <div id="hero">
-      <div className="infoTag">
-        {canvasContext ? <img className="icon" src={statusActiveIcon} /> : ""}
-        <p>{canvasContext ? canvasContext : "no rendering backend"}</p>
-      </div>
-      <canvas
-        ref={canvasRef}
-        id="myCanvas"
-        onMouseDown={startDrag}
-        onMouseMove={drag}
-        onMouseUp={stopDrag}
-        onMouseLeave={stopDrag}
-      />
+      <canvas ref={canvasRef} id="myCanvas" />
     </div>
   );
 }
