@@ -41,21 +41,21 @@ const projects = [
     stack: [ TechItems.CLAUDE_CODE, TechItems.CODEX, TechItems.REACT, TechItems.TYPESCRIPT, TechItems.FASTAPI, TechItems.MCP ],
     gh_link: "https://github.com/Benjamincf0/omniclaw",
     description: `• Built an MCP server for a student portal, empowering agents to help with homework and emails.
-• Integrated OAuth2 to let users login from their favourite MCP client (i.e. Codex / Claude code). • Automated a secondary login flow using a backend playwright instance to log into Omnivox on a user’s behalf.
+• Integrated OAuth2 to let users login from their favourite MCP client (i.e. Codex / Claude code).
+• Automated a secondary login flow using a backend playwright instance to log into Omnivox on a user’s behalf.
 • Reverse engineered the Omnivox website to replicate the http headers and intercept the bearer token.`,
     visual_link:
-      "https://www.youtube.com/embed/bILXbqu0I_Q?autoplay=1&mute=1&loop=1&playlist=bILXbqu0I_Q&controls=0",
+      "https://www.youtube.com/embed/bILXbqu0I_Q",
   },
   {
     name: "Unfraudify",
     date: "May 2026",
     tags: [ TagItems.HACKATHON, TagItems.GROUP_PROJECT, TagItems.VIBE_CODING],
     stack: [ TechItems.GMAPS, TechItems.CODEX, TechItems.REACT, TechItems.TYPESCRIPT ],
-    gh_link: "https://github.com/Benjamincf0/omniclaw",
-    description: `• Built an MCP server for a student portal, empowering agents to help with homework and emails.
-• Integrated OAuth2 to let users login from their favourite MCP client (i.e. Codex / Claude code).
-• Automated a secondary login flow using a backend playwright instance to log into Omnivox on a user’s behalf.
-• Reverse engineered the Omnivox website to replicate the http headers and intercept the bearer token.`,
+    gh_link: "https://github.com/Benjamincf0/unfraud",
+    description: `• A fraud triage app built for the MCP Hacks challenge.
+• Ingests a CSV of card transactions, scores every row for fraud risk, explains each alert in plain language.
+• Gives a human reviewer a keyboard-driven queue to approve, dismiss, or escalate decisions.`,
     visual_link:
       "https://www.youtube.com/embed/UJjLP23gBKk",
   },
@@ -76,7 +76,7 @@ const projects = [
     date: "May 2026",
     tags: [ TagItems.SCHOOL_PROJECT, TagItems.GROUP_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.UMPLE, TechItems.JAVA ],
-    gh_link: "https://github.com/Benjamincf0/Neural-Network-Library",
+    gh_link: "https://github.com/Benjamincf0/CheeseManager",
     description: `• Developed an application for a comté cheese distribution business following the MVC pattern in Java.
 • Created an aesthetically pleasing user interface with JavaFX using reusable components.
 • Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
