@@ -86,7 +86,7 @@ export const TechItems = {
     img_src: "gmaps-icon",
   },
   JUPYTER_LAB: {
-    name: "Jupyter lab notebook",
+    name: "Jupyter Lab Notebook",
     img_src: "jupyter-lab-icon",
   },
   LABEL_STUDIO: {

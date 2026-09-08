@@ -202,7 +202,18 @@ function Projectcard({
               </p>
             ))}
           </div>
+          <div className="projectTitle">
           <h3>{name}</h3>
+          <a className="github" href={gh_link} target="_blank">
+            <svg
+              href={gh_link}
+              role="presentation"
+              aria-hidden="true"
+            >
+              <use href="/icons.svg#github-icon"></use>
+            </svg>
+          </a>
+          </div>
         </div>
         <div className="mainContent">
           <p className="description">{description}</p>

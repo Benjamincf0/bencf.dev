@@ -27,8 +27,24 @@
       padding: 20px;
       text-align: left;
       .header {
-        h3 {
-          color: var(--text-h);
+        .projectTitle {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .github {
+            margin-left: 10px;
+            height: 30px;
+            width: 30px;
+            svg {
+              color: var(--text-h);
+              height: 100%;
+              width: 100%;
+            }
+          }
+          h3 {
+            /* flex: 1; */
+            color: var(--text-h);
+          }
         }
         .tags {
           p {
