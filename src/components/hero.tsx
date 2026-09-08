@@ -104,7 +104,7 @@ export default function Hero() {
 
       const curve = new THREE.CatmullRomCurve3(
         [
-          new THREE.Vector3(0, 2, 2),
+          new THREE.Vector3(0, 3, 3),
           new THREE.Vector3(0, 1, 0.1),
           new THREE.Vector3(0, 0.5, 0.01),
         ],
