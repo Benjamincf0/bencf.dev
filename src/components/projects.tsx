@@ -72,7 +72,7 @@ const projects = [
     visual_link: "https://www.youtube.com/embed/4Dq92_spTPA",
   },
   {
-    name: "Cheese Manager",
+    name: "CheeseOps",
     date: "May 2026",
     tags: [ TagItems.SCHOOL_PROJECT, TagItems.GROUP_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.UMPLE, TechItems.JAVA ],
@@ -87,7 +87,7 @@ const projects = [
     date: "May 2026",
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE],
     stack: [ TechItems.CSS, TechItems.HTML, TechItems.JAVASCRIPT, TechItems.FIREBASE],
-    gh_link: "https://github.com/Benjamincf0/Neural-Network-Library",
+    gh_link: "https://github.com/Benjamincf0/WebChat",
     description: `• Developed a full-stack web messaging platform with authentication to message friends.
 • Programmed search and adding friends features with Cloud Functions.
 • Implemented Firestore security rules to ensure secure communications.`,
@@ -99,20 +99,20 @@ const projects = [
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.C ],
     gh_link: "https://github.com/Benjamincf0/cnake",
-    description: `• Developed an application for a comté cheese distribution business following the MVC pattern in Java.
-• Created an aesthetically pleasing user interface with JavaFX using reusable components.
-• Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
+    description: `• Learned ANSI escape sequences to render stuff to the screen with colours, etc.
+• Implemented a circular array using a struct.
+• Used termios to customize the terminal and to allow for non-blocking & non-buffered controls.`,
     visual_link: "https://www.youtube.com/embed/jgfgDvXhVFg",
   },
   {
-    name: "Smart Courier Robot",
+    name: "RoboDelivery",
     date: "November 2025",
     tags: [ TagItems.SCHOOL_PROJECT, TagItems.GROUP_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.PYTHON , TechItems.RASPBERRY_PI ],
-    gh_link: "https://github.com/Benjamincf0/cnake",
-    description: `• Developed an application for a comté cheese distribution business following the MVC pattern in Java.
-• Created an aesthetically pleasing user interface with JavaFX using reusable components.
-• Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
+    gh_link: "https://github.com/BagetTeam/bakers-pi-final",
+    description: `A robot that delivers packages to rooms automatically! It traverses the map, looks through rooms without meetings (red pads) and finds the package landing pad (green pad) where the package is going to be delivered at. After a successful delivery, it returns back to the mail room (blue room), and celebrates.
+
+Cool sound effects added to the robot to give a nice ambiance when the robot is traveling and delivering packages, including a superb audio when it finishes its job.. ;)`,
     visual_link: "https://www.youtube.com/embed/plpx3dQ-prg",
   },
   {
@@ -120,10 +120,8 @@ const projects = [
     date: "May 2026",
     tags: [ TagItems.PERSONAL_PROJECT ],
     stack: [ TechItems.GMAPS, TechItems.PYTHON , TechItems.JUPYTER_LAB ],
-    gh_link: "https://github.com/Benjamincf0/cnake",
-    description: `• Developed an application for a comté cheese distribution business following the MVC pattern in Java.
-• Created an aesthetically pleasing user interface with JavaFX using reusable components.
-• Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
+    gh_link: "https://github.com/Benjamincf0/learning",
+    description: `• I used bixi's open data in combination with the google maps routes api to guess the paths taken by bixi riders, and plot them into a nice heatmap. Take a look at the notebooks if you like :)`,
     visual_link: "./projects/biximap.png",
   },
   {
