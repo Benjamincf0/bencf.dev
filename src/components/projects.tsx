@@ -126,6 +126,15 @@ const projects = [
 • Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
     visual_link: "./projects/biximap.png",
   },
+  {
+    name: "Plushie Detector",
+    date: "November 2025",
+    tags: [ TagItems.PERSONAL_PROJECT ],
+    stack: [ TechItems.PYTHON , TechItems.JUPYTER_LAB, TechItems.LABEL_STUDIO ],
+    gh_link: "https://github.com/Benjamincf0/plushie_detector",
+    description: `• Trained a YOLO model to detect different plushies by creating my own custom labelled dataset in label studio.`,
+    visual_link: "./projects/example_segmentation.png",
+  },
 ];
 
 interface ProjectCardTag {

@@ -89,6 +89,26 @@ export const TechItems = {
     name: "Jupyter lab notebook",
     img_src: "jupyter-lab-icon",
   },
+  LABEL_STUDIO: {
+    name: "Label Studio",
+    img_src: "labelstudio-icon",
+  },
+  JAVASCRIPT: {
+    name: "Javascript",
+    img_src: "javascript-icon",
+  },
+  JAVASCRIPT: {
+    name: "Javascript",
+    img_src: "javascript-icon",
+  },
+  JAVASCRIPT: {
+    name: "Javascript",
+    img_src: "javascript-icon",
+  },
+  JAVASCRIPT: {
+    name: "Javascript",
+    img_src: "javascript-icon",
+  },
   JAVASCRIPT: {
     name: "Javascript",
     img_src: "javascript-icon",
