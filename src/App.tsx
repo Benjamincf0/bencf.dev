@@ -25,8 +25,8 @@ function App() {
         <div className="ticks"></div>
         <h2><span className="hover-line">Projects</span></h2>
         <Projects />
-        <h2><span className="hover-line">Recent readings</span></h2>
-        <Readings />
+        {/* <h2><span className="hover-line">Recent readings</span></h2> */}
+        {/* <Readings /> */}
         <h2><span className="hover-line">Open Source Contributions</span></h2>
         <Contributions />
         <h2><span className="hover-line">Certifications</span></h2>

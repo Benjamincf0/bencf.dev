@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import "#styles/hero.css";
 import { load } from "@loaders.gl/core";
 // import { PolyDataMapper, WebGLActor, Camera, WebGLRenderer} from "./../four.ts"
@@ -29,150 +29,103 @@ function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
   return needResize;
 }
 
-function createTerminal({
-  width = 1024,
-  height = 512,
-  bgColor = '#000000',
-  textColor = '#00ff00',
-  font = '28px "Courier New", monospace',
-  padding = 20,
-  lineHeight = 34
-} = {}) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext('2d');
-  ctx.font = font;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-
-  const texture = new THREE.CanvasTexture(canvas);
-  const lines = [];
-
-  function redraw() {
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = textColor;
-    lines.forEach((line, i) => {
-      ctx.fillText(line, padding, padding + i * lineHeight);
-    });
-    texture.needsUpdate = true;
-  }
-
-  function appendLine(text) {
-    lines.push(text);
-    const maxLines = Math.floor((height - padding * 2) / lineHeight);
-    if (lines.length > maxLines) lines.shift(); // drop oldest, keeps it scrolling
-    redraw();
-  }
-
-  redraw();
-  return { canvas, texture, appendLine };
-}
-
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   // This function runs after the component renders.
   // It initializes our webgl context, shader program, and positionBuffer.
   useEffect(() => {
+    const pointer = { x: 0, y: 0 };
+    const tilt = { x: 0, y: 0 };
+    let renderer: THREE.WebGPURenderer | undefined;
+    let rendererInitialized = false;
+    let active = true;
+
+    const onMouseMove = (event: MouseEvent) => {
+      pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = (event.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener("mousemove", onMouseMove);
+
     (async () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       resizeCanvasToDisplaySize(canvas);
-      const renderer = new THREE.WebGPURenderer({ canvas });
+      renderer = new THREE.WebGPURenderer({ canvas });
       await renderer.init();
+      rendererInitialized = true;
+      if (!active) {
+        void renderer.dispose();
+        return;
+      }
       renderer.setPixelRatio(window.devicePixelRatio);
       // renderer.setSize(window.innerWidth, window.innerHeight);
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
-        50,
+        30,
         window.innerWidth / window.innerHeight,
         0.01,
         100,
       );
-      camera.up.set(0, -1, 0);
+      camera.up.set(0, 0, -1);
 
       // load splat
-      const splatGeometry = await new SPZLoader().loadAsync("splat(4).spz");
+      const splatGeometry = await new SPZLoader().loadAsync("splat_ben2.spz");
+      if (!active) return;
       const splats = new GaussianSplat(splatGeometry);
       splats.translateZ(0.1)
       scene.add(splats);
 
       const curve = new THREE.CatmullRomCurve3(
         [
-          new THREE.Vector3(0, 3, 3),
-          new THREE.Vector3(0, 1, 0.1),
-          new THREE.Vector3(0, 0.5, 0.01),
+          new THREE.Vector3(0, -4, 0.1),
+          new THREE.Vector3(0, -3, 0.3),
         ],
         false,
       ); // true = closed loop
 
       const clock = new THREE.Clock();
       const duration = 6; // seconds for one full loop
-
-      const terminal = createTerminal();
-
-      const geometry = new THREE.PlaneGeometry(0.4, 0.23);
-      const material = new THREE.MeshBasicMaterial({ map: terminal.texture });
-      const screen = new THREE.Mesh(geometry, material);
-      screen.translateZ(0.08);
-      screen.rotation.z = Math.PI;
-      screen.rotation.x = -Math.PI / 2;
-      scene.add(screen);
-
-      terminal.appendLine('> Welcome to my portfolio website');
-      terminal.appendLine('> Look at my projects!');
+      const lookAtTarget = new THREE.Vector3(0, 1, 0);
+      const viewDirection = new THREE.Vector3();
+      const orbitRight = new THREE.Vector3();
+      const orbitRange = 0.4;
 
       renderer.setAnimationLoop(() => {
         const t = Math.min(clock.getElapsedTime(), duration) / duration; // 0 → 1
         const pos = curve.getPointAt(1 - (t - 1) ** 4);
+        tilt.x = THREE.MathUtils.lerp(tilt.x, pointer.x, 0.05);
+        tilt.y = THREE.MathUtils.lerp(tilt.y, pointer.y, 0.05);
+
+        // Orbit the camera position around the world origin, keeping its up axis fixed.
+        orbitRight.crossVectors(viewDirection.subVectors(lookAtTarget, pos), camera.up).normalize();
+        pos.applyAxisAngle(camera.up, tilt.x * orbitRange);
+        orbitRight.applyAxisAngle(camera.up, tilt.x * orbitRange);
+        pos.applyAxisAngle(orbitRight, tilt.y * orbitRange);
         camera.position.copy(pos);
-        camera.lookAt(0, 0, 0); // or use curve.getTangentAt(t) to look ahead
+        camera.lookAt(lookAtTarget);
 
         renderer.render(scene, camera);
       });
     })();
+
+    return () => {
+      active = false;
+      window.removeEventListener("mousemove", onMouseMove);
+      if (rendererInitialized) void renderer?.dispose();
+    };
   }, []); // Only runs once since we pass [] as depsList
-
-  let x0 = null;
-  let y0 = null;
-  function startDrag() {
-    setIsDragging(true);
-    console.log("started dragging");
-  }
-
-  function drag(e) {
-    if (!isDragging) return;
-
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    if (!x0 || !y0) {
-      x0 = x;
-      y0 = y;
-      return;
-    }
-
-    const phi = Math.atan(x - x0);
-    const theta = Math.atan(y - y0);
-
-    mat4.rotateY(WCVCMatrix, WCVCMatrix, 0.01 * theta);
-    mat4.rotateX(WCVCMatrix, WCVCMatrix, 0.01 * phi);
-  }
-
-  function stopDrag() {
-    setIsDragging(false);
-  }
 
   return (
     <div id="hero">
+      <div className="title">
+        <h1>Hey I'm Ben</h1>
+        <h2>Take a look at my projects.</h2>
+      </div>
+      <div className="canvas_container">
       <canvas ref={canvasRef} id="myCanvas" />
+      </div>
     </div>
   );
 }
