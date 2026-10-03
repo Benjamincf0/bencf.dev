@@ -177,8 +177,8 @@ function Projectcard({
       <div className="top">
         {visual_link.includes("https://www.youtube.com") ? (
           <iframe
-            width="560"
-            height="315"
+            width="100%"
+            height="100%"
             src={visual_link}
             title="YouTube video player"
             frameBorder="0"
