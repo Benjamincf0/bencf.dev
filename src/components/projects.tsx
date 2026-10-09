@@ -48,6 +48,32 @@ const projects = [
       "https://www.youtube.com/embed/bILXbqu0I_Q",
   },
   {
+    name: "CPU",
+    date: "August 2026",
+    tags: [ TagItems.SCHOOL_PROJECT ],
+    stack: [  ],
+    gh_link: "https://github.com/Benjamincf0/uni",
+    description: `• Designed and implemented an ARM cpu using logic gates.
+• Designed an ALU, register file, and a state machine to manage the 5 stage instructions.
+• Implemented branching operations, along with memory read/write.
+• Tested the cpu by executing assembly instructions that performed multiplication.`,
+    visual_link:
+      "./projects/cpu.png",
+  },
+  {
+    name: "Miniasyncio",
+    date: "June 2026",
+    tags: [ TagItems.PERSONAL_PROJECT],
+    stack: [ TechItems.PYTHON ],
+    gh_link: "",
+    description: `• Designed and implemented an asynchronous python package inspired by Asyncio.
+• Implemented my own coroutines, event loop, and tasks.
+• Published my package on pypi.org for easy install via pip.
+`,
+    visual_link:
+      "./projects/miniasyncio.png",
+  },
+  {
     name: "Unfraudify",
     date: "May 2026",
     tags: [ TagItems.HACKATHON, TagItems.GROUP_PROJECT, TagItems.VIBE_CODING],
