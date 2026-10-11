@@ -2,8 +2,10 @@ import { useEffect, useRef } from "react";
 import "#styles/hero.css";
 import * as THREE from "three/webgpu";
 import { SPZLoader } from "three/addons/loaders/SPZLoader.js";
-import { GaussianSplat } from "three/addons/objects/GaussianSplat.js";
+// import { GaussianSplat, splatTime } from "three/addons/objects/GaussianSplat.js";
+import { GaussianSplat, distortCenter, distortRadius, distortStrength } from "../GaussianSplat.js"; // path to YOUR copy
 import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { positionLocal, uniform, vec3, vec4, sin, float } from "three/tsl";
 import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 
 function loadFontAsync(url: string) {
@@ -61,6 +63,7 @@ export default function Hero() {
           height, // rendered portion
         );
         camera.updateProjectionMatrix();
+        return principalOffset
       };
 
       resizeRenderer();
@@ -90,6 +93,7 @@ export default function Hero() {
       splats.translateZ(0.1);
       scene.add(splats);
 
+      // VERTEX SHADER STUFF
       const curve = new THREE.CatmullRomCurve3(
         [new THREE.Vector3(-3, -9, -3), new THREE.Vector3(0, -7, -1)],
         false,
@@ -103,7 +107,9 @@ export default function Hero() {
       const orbitRange = 0.4;
 
       renderer.setAnimationLoop(() => {
-        resizeRenderer();
+        const principalOffset = resizeRenderer();
+
+        distortCenter.value.set(0.5 - pointer.x * camera.aspect, 0.3, pointer.y);
         const t = Math.min(clock.getElapsedTime(), duration) / duration; // 0 → 1
         const pos = curve.getPointAt(1 - (t - 1) ** 4);
         tilt.x = THREE.MathUtils.lerp(tilt.x, pointer.x, 0.05);
