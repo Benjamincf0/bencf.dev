@@ -1,10 +1,14 @@
 import { useEffect, useRef } from "react";
 import "#styles/hero.css";
-import { load } from "@loaders.gl/core";
-import statusActiveIcon from "#assets/status-active-svgrepo-com.svg";
 import * as THREE from "three/webgpu";
 import { SPZLoader } from "three/addons/loaders/SPZLoader.js";
 import { GaussianSplat } from "three/addons/objects/GaussianSplat.js";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+
+function loadFontAsync(url: string) {
+  return new FontLoader().loadAsync(url);
+}
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,7 +18,6 @@ export default function Hero() {
   useEffect(() => {
     const pointer = { x: 0, y: 0 };
     const tilt = { x: 0, y: 0 };
-    const scroll = 0;
     let renderer: THREE.WebGPURenderer | undefined;
     let rendererInitialized = false;
     let resizeObserver: ResizeObserver | undefined;
@@ -25,10 +28,6 @@ export default function Hero() {
       pointer.y = (event.clientY / window.innerHeight) * 2 - 1;
     };
     window.addEventListener("mousemove", onMouseMove);
-    const onScroll = (event) => {
-      console.log(window.scrollY)
-    };
-    window.addEventListener("scroll", onScroll);
 
     (async () => {
       const canvas = canvasRef.current;
@@ -52,7 +51,7 @@ export default function Hero() {
 
         renderer?.setSize(width, height, false);
         camera.aspect = width / height;
-        const principalOffset = { x: -1*height/4, y: window.scrollY }; // pixels; +x shifts
+        const principalOffset = { x: (-1 * height) / 4, y: window.scrollY }; // pixels; +x shifts
         camera.setViewOffset(
           width,
           height, // full virtual sensor
@@ -65,7 +64,26 @@ export default function Hero() {
       };
 
       resizeRenderer();
-      // load splat
+
+      // TEXT
+      // const font = await loadFontAsync(
+      //   "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
+      // );
+      //
+      // const textGeometry = new TextGeometry("Type to chat...", {
+      //   font: font,
+      //   size: 0.1,
+      //   depth: 0.02,
+      // });
+      // textGeometry.center();
+      // const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+      // const textMesh = new THREE.Mesh(textGeometry, material);
+      // textMesh.lookAt(0, -1, 0);
+      // textMesh.position.set(0, 0, 1);
+      //
+      // scene.add(textMesh);
+
+      // load SPLAT
       const splatGeometry = await new SPZLoader().loadAsync("splat_ben2.spz");
       if (!active) return;
       const splats = new GaussianSplat(splatGeometry);
@@ -73,13 +91,13 @@ export default function Hero() {
       scene.add(splats);
 
       const curve = new THREE.CatmullRomCurve3(
-        [new THREE.Vector3(0, -9, 0.1), new THREE.Vector3(-0.5, -7, 0.3)],
+        [new THREE.Vector3(-3, -9, -3), new THREE.Vector3(0, -7, -1)],
         false,
       ); // true = closed loop
 
       const clock = new THREE.Clock();
       const duration = 6; // seconds for one full loop
-      const lookAtTarget = new THREE.Vector3(0, -0.5, 0);
+      const lookAtTarget = new THREE.Vector3(0, 0, 0);
       const viewDirection = new THREE.Vector3();
       const orbitRight = new THREE.Vector3();
       const orbitRange = 0.4;
