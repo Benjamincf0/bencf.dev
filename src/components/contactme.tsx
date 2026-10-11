@@ -47,7 +47,7 @@ export default function ContactForm() {
               id="name"
               name="name"
               type="text"
-              placeholder="Mike Hawk"
+              placeholder="John Doe"
               required
             />
             <label htmlFor="email">Email</label>
@@ -55,7 +55,7 @@ export default function ContactForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="mikehawk@gmail.com"
+              placeholder="johndoe@gmail.com"
               required
             />
             <button
