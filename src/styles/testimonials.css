@@ -33,14 +33,16 @@ ul.testimonials {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 45vw;
-    min-width: 15vw;
+    width: calc(100% - 48px);
+    max-width: 65ch;
+    min-width: 0;
     text-align: center;
     font-size: 16px;
     line-height: 1.75;
 
     h3 {
       font-size: 16px;
+      margin: 24px 0 0;
     }
   }
 }

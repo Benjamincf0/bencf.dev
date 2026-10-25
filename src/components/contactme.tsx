@@ -61,17 +61,7 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={contactFormState != "Send"}
-              style={{
-                backgroundColor: (() => {
-                  if (contactFormState.includes("Failed")) {
-                    return "#ef4040";
-                  } else if (contactFormState == "Sent") {
-                    return "#78ec70";
-                  } else {
-                    return "var(--accent-bg)";
-                  }
-                })(),
-              }}
+              data-status={contactFormState.includes("Failed") ? "error" : contactFormState === "Sent" ? "sent" : "idle"}
             >
               {contactFormState}
             </button>

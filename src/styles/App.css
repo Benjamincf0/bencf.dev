@@ -47,8 +47,8 @@
 
 #main h2 {
   font-size: 32px;
-  margin-top: 60px;
-  margin-bottom: 40px;
+  margin-top: clamp(56px, 6vw, 80px);
+  margin-bottom: 32px;
 }
 
 .hover-line {
@@ -91,4 +91,8 @@
     max-width: 1200px;
     margin-inline: auto;
   }
+}
+
+#contact {
+  margin-top: clamp(56px, 6vw, 80px);
 }

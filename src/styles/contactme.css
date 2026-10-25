@@ -1,5 +1,5 @@
 #contactForm {
-  margin-top: 20px;
+  margin-top: 0;
   * {
     color: var(--text-h);
   }
@@ -44,8 +44,32 @@
       gap: 10px 0px;
 
       button {
-        background-color: var(--accent-bg);
+        background-color: color-mix(in srgb, var(--accent) 20%, var(--bg));
         border-color: var(--accent-border);
+        color: var(--text-h);
+        transition: background-color 0.2s ease, transform 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background-color: color-mix(in srgb, var(--accent) 30%, var(--bg));
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(1px);
+        }
+
+        &:disabled {
+          cursor: default;
+        }
+
+        &[data-status="sent"] {
+          background-color: #28734b;
+          color: #fff;
+        }
+
+        &[data-status="error"] {
+          background-color: #b53346;
+          color: #fff;
+        }
         font-weight: 600;
         cursor: pointer;
       }
