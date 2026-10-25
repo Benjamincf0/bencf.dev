@@ -115,9 +115,9 @@
         }
 
         .description {
-          white-space: pre-line;
-          font-size: 15px;
-          line-height: 1.65;
+          white-space: normal;
+          font-size: 14px;
+          line-height: 1.5;
         }
       }
     }

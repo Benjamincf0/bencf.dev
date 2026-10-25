@@ -40,10 +40,10 @@ const projects = [
     tags: [ TagItems.HACKATHON, TagItems.GROUP_PROJECT, TagItems.VIBE_CODING],
     stack: [ TechItems.CLAUDE_CODE, TechItems.CODEX, TechItems.REACT, TechItems.TYPESCRIPT, TechItems.FASTAPI, TechItems.MCP ],
     gh_link: "https://github.com/Benjamincf0/omniclaw",
-    description: `• Built an MCP server for a student portal, empowering agents to help with homework and emails.
-• Integrated OAuth2 to let users login from their favourite MCP client (i.e. Codex / Claude code).
-• Automated a secondary login flow using a backend playwright instance to log into Omnivox on a user’s behalf.
-• Reverse engineered the Omnivox website to replicate the http headers and intercept the bearer token.`,
+    description: `Built an MCP server for a student portal, empowering agents to help with homework and emails.
+Integrated OAuth2 to let users login from their favourite MCP client (i.e. Codex / Claude code).
+Automated a secondary login flow using a backend playwright instance to log into Omnivox on a user’s behalf.
+Reverse engineered the Omnivox website to replicate the http headers and intercept the bearer token.`,
     visual_link:
       "https://www.youtube.com/embed/bILXbqu0I_Q",
   },
@@ -53,10 +53,10 @@ const projects = [
     tags: [ TagItems.SCHOOL_PROJECT ],
     stack: [  ],
     gh_link: "https://github.com/Benjamincf0/uni",
-    description: `• Designed and implemented an ARM cpu using logic gates.
-• Designed an ALU, register file, and a state machine to manage the 5 stage instructions.
-• Implemented branching operations, along with memory read/write.
-• Tested the cpu by executing assembly instructions that performed multiplication.`,
+    description: `Designed and implemented an ARM cpu using logic gates.
+Designed an ALU, register file, and a state machine to manage the 5 stage instructions.
+Implemented branching operations, along with memory read/write.
+Tested the cpu by executing assembly instructions that performed multiplication.`,
     visual_link:
       "./projects/cpu.png",
   },
@@ -66,9 +66,9 @@ const projects = [
     tags: [ TagItems.PERSONAL_PROJECT],
     stack: [ TechItems.PYTHON ],
     gh_link: "",
-    description: `• Designed and implemented an asynchronous python package inspired by Asyncio.
-• Implemented my own coroutines, event loop, and tasks.
-• Published my package on pypi.org for easy install via pip.
+    description: `Designed and implemented an asynchronous python package inspired by Asyncio.
+Implemented my own coroutines, event loop, and tasks.
+Published my package on pypi.org for easy install via pip.
 `,
     visual_link:
       "./projects/miniasyncio.png",
@@ -79,9 +79,9 @@ const projects = [
     tags: [ TagItems.HACKATHON, TagItems.GROUP_PROJECT, TagItems.VIBE_CODING],
     stack: [ TechItems.GMAPS, TechItems.CODEX, TechItems.REACT, TechItems.TYPESCRIPT ],
     gh_link: "https://github.com/Benjamincf0/unfraud",
-    description: `• A fraud triage app built for the MCP Hacks challenge.
-• Ingests a CSV of card transactions, scores every row for fraud risk, explains each alert in plain language.
-• Gives a human reviewer a keyboard-driven queue to approve, dismiss, or escalate decisions.`,
+    description: `A fraud triage app built for the MCP Hacks challenge.
+Ingests a CSV of card transactions, scores every row for fraud risk, explains each alert in plain language.
+Gives a human reviewer a keyboard-driven queue to approve, dismiss, or escalate decisions.`,
     visual_link:
       "https://www.youtube.com/embed/UJjLP23gBKk",
   },
@@ -91,10 +91,10 @@ const projects = [
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.PYGAME, TechItems.PYTHON, TechItems.NUMPY ],
     gh_link: "https://github.com/Benjamincf0/Neural-Network-Library",
-    description: `• Created a NN library complete with mini-batch gradient descent and activation/cost functions.
-• Trained a sequential neural network achieving ∼96% test accuracy on MNIST dataset.
-• Implemented customizable network and layer shapes for enhanced flexibility and scalability.
-• Visualized inference with an interactive real-time digit recognition game using PyGame`,
+    description: `Created a NN library complete with mini-batch gradient descent and activation/cost functions.
+Trained a sequential neural network achieving ∼96% test accuracy on MNIST dataset.
+Implemented customizable network and layer shapes for enhanced flexibility and scalability.
+Visualized inference with an interactive real-time digit recognition game using PyGame`,
     visual_link: "https://www.youtube.com/embed/4Dq92_spTPA",
   },
   {
@@ -103,9 +103,9 @@ const projects = [
     tags: [ TagItems.SCHOOL_PROJECT, TagItems.GROUP_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.UMPLE, TechItems.JAVA ],
     gh_link: "https://github.com/Benjamincf0/CheeseManager",
-    description: `• Developed an application for a comté cheese distribution business following the MVC pattern in Java.
-• Created an aesthetically pleasing user interface with JavaFX using reusable components.
-• Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
+    description: `Developed an application for a comté cheese distribution business following the MVC pattern in Java.
+Created an aesthetically pleasing user interface with JavaFX using reusable components.
+Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
     visual_link: "./projects/cheese_manager.png",
   },
   {
@@ -114,9 +114,9 @@ const projects = [
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE],
     stack: [ TechItems.CSS, TechItems.HTML, TechItems.JAVASCRIPT, TechItems.FIREBASE],
     gh_link: "https://github.com/Benjamincf0/WebChat",
-    description: `• Developed a full-stack web messaging platform with authentication to message friends.
-• Programmed search and adding friends features with Cloud Functions.
-• Implemented Firestore security rules to ensure secure communications.`,
+    description: `Developed a full-stack web messaging platform with authentication to message friends.
+Programmed search and adding friends features with Cloud Functions.
+Implemented Firestore security rules to ensure secure communications.`,
     visual_link: "https://www.youtube.com/embed/jmI3FrzOFIY",
   },
   {
@@ -125,9 +125,9 @@ const projects = [
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.C ],
     gh_link: "https://github.com/Benjamincf0/cnake",
-    description: `• Learned ANSI escape sequences to render stuff to the screen with colours, etc.
-• Implemented a circular array using a struct.
-• Used termios to customize the terminal and to allow for non-blocking & non-buffered controls.`,
+    description: `Learned ANSI escape sequences to render stuff to the screen with colours, etc.
+Implemented a circular array using a struct.
+Used termios to customize the terminal and to allow for non-blocking & non-buffered controls.`,
     visual_link: "https://www.youtube.com/embed/jgfgDvXhVFg",
   },
   {
@@ -147,7 +147,7 @@ Cool sound effects added to the robot to give a nice ambiance when the robot is 
     tags: [ TagItems.PERSONAL_PROJECT ],
     stack: [ TechItems.GMAPS, TechItems.PYTHON , TechItems.JUPYTER_LAB ],
     gh_link: "https://github.com/Benjamincf0/learning",
-    description: `• I used bixi's open data in combination with the google maps routes api to guess the paths taken by bixi riders, and plot them into a nice heatmap. Take a look at the notebooks if you like :)`,
+    description: `I used bixi's open data in combination with the google maps routes api to guess the paths taken by bixi riders, and plot them into a nice heatmap. Take a look at the notebooks if you like :)`,
     visual_link: "./projects/biximap.png",
   },
   {
@@ -156,7 +156,7 @@ Cool sound effects added to the robot to give a nice ambiance when the robot is 
     tags: [ TagItems.PERSONAL_PROJECT ],
     stack: [ TechItems.PYTHON , TechItems.JUPYTER_LAB, TechItems.LABEL_STUDIO ],
     gh_link: "https://github.com/Benjamincf0/plushie_detector",
-    description: `• Trained a YOLO model to detect different plushies by creating my own custom labelled dataset in label studio.`,
+    description: `Trained a YOLO model to detect different plushies by creating my own custom labelled dataset in label studio.`,
     visual_link: "./projects/example_segmentation.png",
   },
 ];
