@@ -36,9 +36,11 @@ ul.testimonials {
     max-width: 45vw;
     min-width: 15vw;
     text-align: center;
+    font-size: 16px;
+    line-height: 1.75;
 
     h3 {
-      font-size: 18px;
+      font-size: 16px;
     }
   }
 }

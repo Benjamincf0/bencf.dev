@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: 0;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
 
@@ -23,11 +23,12 @@
       justify-content: center;
       align-items: center;
       box-shadow: var(--shadow);
-      background-color: rgb(220, 220, 220, 0.5);
+      background-color: rgba(250, 249, 252, 0.9);
+      border: 1px solid var(--border);
       /* NOTE: order is important here otherwise lightningcss deletes blur... */
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
-      padding: 10px;
+      padding: 9px;
       width: 100%;
       height: 100%;
       box-sizing: border-box;
@@ -52,7 +53,7 @@
   }
   li:hover {
     .wrapper {
-      border: solid var(--accent-border) 2px;
+      border-color: var(--accent-border);
     }
     .grower {
       grid-template-columns: 1fr;

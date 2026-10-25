@@ -1,25 +1,29 @@
 /* Here we define the general styles and so on using variables. */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
+  --text: #595361;
+  --text-h: #211d27;
   --bg: #fff;
-  --border: #e5e4e7;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
+  --border: #e4e0e8;
+  --surface: #faf9fc;
+  --radius: 12px;
+  --radius-small: 8px;
+  --accent: #8b45cf;
+  --accent-bg: rgba(139, 69, 207, 0.07);
   --dark-bg: #2a282f;
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --accent-border: rgba(139, 69, 207, 0.4);
+  --shadow: 0 3px 12px rgba(33, 29, 39, 0.06);
+  --shadow-hover: 0 8px 24px rgba(33, 29, 39, 0.1);
 
   --text-body-size-small: 0.75rem;
   --base-text-weight-semibold: 600;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --heading: var(--sans);
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  font: 17px/1.65 var(--sans);
+  letter-spacing: 0;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -48,9 +52,13 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3,
+h4 {
   font-family: var(--heading);
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
   color: var(--text-h);
 }
 
@@ -74,4 +82,18 @@ h2 {
 }
 p {
   margin: 0;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }

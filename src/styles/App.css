@@ -20,6 +20,9 @@
     position: absolute;
     width: 100%;
     bottom: 0;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 400;
   }
   @media (max-width: 1024px) {
     height: 48px;
@@ -27,19 +30,19 @@
 }
 
 .card {
-  border: solid transparent 2px;
-  background-color: #f5f5f5;
-  box-shadow: 5px 5px 10px 2px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  box-shadow: var(--shadow);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  border: solid var(--accent-border) 2px;
-  box-shadow: 5px 10px 20px 2px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-hover);
 }
 
 .card:focus {
-  border: solid var(--accent-border) 2px;
+  border-color: var(--accent-border);
 }
 
 #main h2 {
@@ -58,7 +61,7 @@
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #000;
+    background-color: currentColor;
     transform: scaleX(0);
     transform-origin: bottom left;
     transition: transform 0.25s ease-out;
@@ -72,5 +75,20 @@
   &.hovered::after {
     transform: scaleX(1);
     transform-origin: bottom left;
+  }
+}
+
+/* Keep content readable on wide desktop screens. */
+#main {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+@media (min-width: 801px) {
+  #contact {
+    width: calc(100% - 64px);
+    max-width: 1200px;
+    margin-inline: auto;
   }
 }

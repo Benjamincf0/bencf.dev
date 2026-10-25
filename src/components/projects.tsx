@@ -221,7 +221,7 @@ function Projectcard({
         <div className="header">
           <div className="tags">
             {tags.map(({ name, bg_color }) => (
-              <p key={name} style={{ backgroundColor: bg_color }}>
+              <p key={name} style={{ "--tag-color": bg_color } as React.CSSProperties}>
                 {name}
               </p>
             ))}

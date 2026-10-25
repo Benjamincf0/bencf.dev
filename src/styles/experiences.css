@@ -12,7 +12,7 @@
 .experienceCard {
   width: 80%;
   max-width: 1000px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   box-sizing: border-box;
   padding: 20px;
   interpolate-size: allow-keywords;
@@ -51,12 +51,15 @@
         margin: 0;
         margin-top: 5px;
         font-size: 15px;
-        color: #555555;
+        color: var(--text);
+        font-weight: 400;
+        letter-spacing: 0;
       }
     }
     .right {
       flex: 2;
       text-align: right;
+      font-size: 14px;
     }
   }
   .bottom {
@@ -74,7 +77,8 @@
       height: 0;
       overflow: hidden;
       white-space: pre-line;
-      font-size: 18px;
+      font-size: 16px;
+      line-height: 1.7;
     }
   }
 }

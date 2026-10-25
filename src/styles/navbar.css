@@ -4,8 +4,10 @@
   box-sizing: border-box;
   top: 0;
   z-index: 5;
-  padding: 20px 20px 20px 40px;
-  background-color: rgba(200, 200, 200, 0.2);
+  padding: 20px clamp(20px, 3vw, 48px);
+  gap: 24px;
+  background-color: rgba(250, 249, 252, 0.9);
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 
   align-items: center;
@@ -28,7 +30,7 @@
       width: fit-content;
       gap: 10px;
       text-decoration: none;
-      color: black;
+      color: var(--text-h);
       .button-icon {
         height: 26px;
         width: 26px;
@@ -64,8 +66,9 @@
 
   a {
     color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: var(--radius-small);
     display: flex;
     padding: 6px 12px;
     align-items: center;
@@ -75,7 +78,7 @@
 
     &:hover {
       box-shadow: var(--shadow);
-      background-color: rgba(10, 10, 10, 0.1);
+      background-color: var(--accent-bg);
       svg.linkedin {
         color: #0077b5;
       }
@@ -89,7 +92,7 @@
     }
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 800px) {
     margin-top: 20px;
     flex-wrap: wrap;
     justify-content: center;
