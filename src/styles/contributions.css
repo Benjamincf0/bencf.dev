@@ -1,10 +1,107 @@
 .contributions-container {
+  width: 100%;
+  max-width: 864px;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 0 24px;
   text-align: left;
-  padding: 0 clamp(24px, 6vw, 100px);
+}
+
+.contribution-deck {
+  display: grid;
+  isolation: isolate;
+  padding-bottom: 28px;
+}
+
+.contribution-layer {
+  grid-area: 1 / 1;
+  min-width: 0;
+  transform-origin: center bottom;
+  transform: translateY(calc(var(--depth) * 12px))
+    rotate(calc(var(--depth) * 0.5deg))
+    scale(calc(1 - var(--depth) * 0.025));
+  transition: transform 0.3s ease, opacity 0.2s ease;
+
+  > .Box {
+    height: 100%;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+  }
+
+  &[inert] {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &[data-hidden="true"] {
+    opacity: 0;
+  }
+}
+
+.contribution-deck.is-expanded {
+  gap: 20px;
+  padding-bottom: 0;
+
+  .contribution-layer {
+    grid-area: auto;
+    transform: none;
+  }
+}
+
+.contribution-controls {
   display: flex;
-  flex-direction: column;
-  gap: 40px;
   align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+    background: var(--surface);
+    color: var(--text-h);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+    }
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .contribution-toggle {
+    margin-left: auto;
+    padding-inline: 14px;
+  }
+}
+
+.contribution-position {
+  color: var(--text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contribution-layer,
+  .contribution-controls button {
+    transition: none;
+  }
 }
 
 /* Colors */
