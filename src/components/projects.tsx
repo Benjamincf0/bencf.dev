@@ -54,7 +54,7 @@ const projects = [
     stack: [  ],
     gh_link: "https://github.com/Benjamincf0/uni",
     description: (
-      <>Designed and implemented an <strong>ARM cpu</strong> using logic gates. Designed an <strong>ALU</strong>, register file, and a state machine to manage the 5 stage instructions. Implemented branching operations, along with memory read/write. Tested the cpu by executing <strong>assembly instructions</strong> that performed multiplication.</>
+      <>Designed and implemented an <strong>ARM cpu</strong> using logic gates. Designed an <strong>ALU</strong>, register file, and a state machine to manage the 5 stage instructions. Implemented <strong>conditional branching</strong> operations, along with memory read/write. Tested the cpu by executing <strong>assembly instructions</strong> that performed multiplication.</>
     ),
     visual_link:
       "./projects/cpu.png",
