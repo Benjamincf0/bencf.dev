@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import reactLogo from "#assets/react.svg";
 import typescriptLogo from "#assets/typescript-16-svgrepo-com.svg";
 import glslLogo from "#assets/glsl-svgrepo-com.svg";
@@ -40,10 +41,9 @@ const projects = [
     tags: [ TagItems.HACKATHON, TagItems.GROUP_PROJECT, TagItems.VIBE_CODING],
     stack: [ TechItems.CLAUDE_CODE, TechItems.CODEX, TechItems.REACT, TechItems.TYPESCRIPT, TechItems.FASTAPI, TechItems.MCP ],
     gh_link: "https://github.com/Benjamincf0/omniclaw",
-    description: `Built an MCP server for a student portal, empowering agents to help with homework and emails.
-Integrated OAuth2 to let users login from their favourite MCP client (i.e. Codex / Claude code).
-Automated a secondary login flow using a backend playwright instance to log into Omnivox on a user’s behalf.
-Reverse engineered the Omnivox website to replicate the http headers and intercept the bearer token.`,
+    description: (
+      <>Built an <strong>MCP server</strong> for a student portal, empowering agents to help with homework and emails. Integrated <strong>OAuth2</strong> to let users login from their favourite MCP client (i.e. Codex / Claude code). Automated a secondary login flow using a backend <strong>playwright</strong> instance to log into Omnivox on a user’s behalf. <strong>Reverse engineered</strong> the Omnivox website to replicate the http headers and intercept the bearer token.</>
+    ),
     visual_link:
       "https://www.youtube.com/embed/bILXbqu0I_Q",
   },
@@ -53,10 +53,9 @@ Reverse engineered the Omnivox website to replicate the http headers and interce
     tags: [ TagItems.SCHOOL_PROJECT ],
     stack: [  ],
     gh_link: "https://github.com/Benjamincf0/uni",
-    description: `Designed and implemented an ARM cpu using logic gates.
-Designed an ALU, register file, and a state machine to manage the 5 stage instructions.
-Implemented branching operations, along with memory read/write.
-Tested the cpu by executing assembly instructions that performed multiplication.`,
+    description: (
+      <>Designed and implemented an <strong>ARM cpu</strong> using logic gates. Designed an <strong>ALU</strong>, register file, and a state machine to manage the 5 stage instructions. Implemented branching operations, along with memory read/write. Tested the cpu by executing <strong>assembly instructions</strong> that performed multiplication.</>
+    ),
     visual_link:
       "./projects/cpu.png",
   },
@@ -66,10 +65,9 @@ Tested the cpu by executing assembly instructions that performed multiplication.
     tags: [ TagItems.PERSONAL_PROJECT],
     stack: [ TechItems.PYTHON ],
     gh_link: "",
-    description: `Designed and implemented an asynchronous python package inspired by Asyncio.
-Implemented my own coroutines, event loop, and tasks.
-Published my package on pypi.org for easy install via pip.
-`,
+    description: (
+      <>Designed and implemented an <strong>asynchronous python package</strong> inspired by Asyncio. Implemented my own <strong>coroutines</strong>, <strong>event loop</strong>, and tasks. Published my package on <strong>pypi.org</strong> for easy install via pip.</>
+    ),
     visual_link:
       "./projects/miniasyncio.png",
   },
@@ -79,9 +77,9 @@ Published my package on pypi.org for easy install via pip.
     tags: [ TagItems.HACKATHON, TagItems.GROUP_PROJECT, TagItems.VIBE_CODING],
     stack: [ TechItems.GMAPS, TechItems.CODEX, TechItems.REACT, TechItems.TYPESCRIPT ],
     gh_link: "https://github.com/Benjamincf0/unfraud",
-    description: `A fraud triage app built for the MCP Hacks challenge.
-Ingests a CSV of card transactions, scores every row for fraud risk, explains each alert in plain language.
-Gives a human reviewer a keyboard-driven queue to approve, dismiss, or escalate decisions.`,
+    description: (
+      <>A fraud triage app built for the MCP Hacks challenge. Ingests a CSV of card transactions, scores every row for <strong>fraud risk</strong>, explains each alert in plain language. Gives a human reviewer a <strong>keyboard-driven queue</strong> to approve, dismiss, or escalate decisions.</>
+    ),
     visual_link:
       "https://www.youtube.com/embed/UJjLP23gBKk",
   },
@@ -91,10 +89,9 @@ Gives a human reviewer a keyboard-driven queue to approve, dismiss, or escalate 
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.PYGAME, TechItems.PYTHON, TechItems.NUMPY ],
     gh_link: "https://github.com/Benjamincf0/Neural-Network-Library",
-    description: `Created a NN library complete with mini-batch gradient descent and activation/cost functions.
-Trained a sequential neural network achieving ∼96% test accuracy on MNIST dataset.
-Implemented customizable network and layer shapes for enhanced flexibility and scalability.
-Visualized inference with an interactive real-time digit recognition game using PyGame`,
+    description: (
+      <>Created a NN library complete with <strong>mini-batch gradient descent</strong> and activation/cost functions. Trained a sequential neural network achieving <strong>∼96% test accuracy</strong> on <strong>MNIST</strong> dataset. Implemented customizable network and layer shapes for enhanced flexibility and scalability. Visualized inference with an interactive real-time digit recognition game using <strong>PyGame</strong></>
+    ),
     visual_link: "https://www.youtube.com/embed/4Dq92_spTPA",
   },
   {
@@ -103,9 +100,9 @@ Visualized inference with an interactive real-time digit recognition game using 
     tags: [ TagItems.SCHOOL_PROJECT, TagItems.GROUP_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.UMPLE, TechItems.JAVA ],
     gh_link: "https://github.com/Benjamincf0/CheeseManager",
-    description: `Developed an application for a comté cheese distribution business following the MVC pattern in Java.
-Created an aesthetically pleasing user interface with JavaFX using reusable components.
-Collaborated with teammates to create a UML class diagram and state diagram using Umple.`,
+    description: (
+      <>Developed an application for a comté cheese distribution business following the <strong>MVC</strong> pattern in Java. Created an aesthetically pleasing user interface with <strong>JavaFX</strong> using reusable components. Collaborated with teammates to create a <strong>UML</strong> class diagram and state diagram using <strong>Umple</strong>.</>
+    ),
     visual_link: "./projects/cheese_manager.png",
   },
   {
@@ -114,9 +111,9 @@ Collaborated with teammates to create a UML class diagram and state diagram usin
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE],
     stack: [ TechItems.CSS, TechItems.HTML, TechItems.JAVASCRIPT, TechItems.FIREBASE],
     gh_link: "https://github.com/Benjamincf0/WebChat",
-    description: `Developed a full-stack web messaging platform with authentication to message friends.
-Programmed search and adding friends features with Cloud Functions.
-Implemented Firestore security rules to ensure secure communications.`,
+    description: (
+      <>Developed a <strong>full-stack</strong> web messaging platform with <strong>authentication</strong> to message friends. Programmed search and adding friends features with <strong>Cloud Functions</strong>. Implemented <strong>Firestore security rules</strong> to ensure secure communications.</>
+    ),
     visual_link: "https://www.youtube.com/embed/jmI3FrzOFIY",
   },
   {
@@ -125,9 +122,9 @@ Implemented Firestore security rules to ensure secure communications.`,
     tags: [ TagItems.PERSONAL_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.C ],
     gh_link: "https://github.com/Benjamincf0/cnake",
-    description: `Learned ANSI escape sequences to render stuff to the screen with colours, etc.
-Implemented a circular array using a struct.
-Used termios to customize the terminal and to allow for non-blocking & non-buffered controls.`,
+    description: (
+      <>Learned <strong>ANSI escape sequences</strong> to render stuff to the screen with colours, etc. Implemented a <strong>circular array</strong> using a struct. Used <strong>termios</strong> to customize the terminal and to allow for non-blocking & non-buffered controls.</>
+    ),
     visual_link: "https://www.youtube.com/embed/jgfgDvXhVFg",
   },
   {
@@ -136,9 +133,9 @@ Used termios to customize the terminal and to allow for non-blocking & non-buffe
     tags: [ TagItems.SCHOOL_PROJECT, TagItems.GROUP_PROJECT, TagItems.NO_AI_CODE ],
     stack: [ TechItems.PYTHON , TechItems.RASPBERRY_PI ],
     gh_link: "https://github.com/BagetTeam/bakers-pi-final",
-    description: `A robot that delivers packages to rooms automatically! It traverses the map, looks through rooms without meetings (red pads) and finds the package landing pad (green pad) where the package is going to be delivered at. After a successful delivery, it returns back to the mail room (blue room), and celebrates.
-
-Cool sound effects added to the robot to give a nice ambiance when the robot is traveling and delivering packages, including a superb audio when it finishes its job.. ;)`,
+    description: (
+      <>A robot that <strong>delivers packages to rooms automatically</strong>! It <strong>traverses the map</strong>, looks through rooms without meetings (red pads) and finds the package landing pad (green pad) where the package is going to be delivered at. After a successful delivery, it returns back to the mail room (blue room), and celebrates. Cool sound effects added to the robot to give a nice ambiance when the robot is traveling and delivering packages, including a superb audio when it finishes its job.. ;)</>
+    ),
     visual_link: "https://www.youtube.com/embed/plpx3dQ-prg",
   },
   {
@@ -147,7 +144,9 @@ Cool sound effects added to the robot to give a nice ambiance when the robot is 
     tags: [ TagItems.PERSONAL_PROJECT ],
     stack: [ TechItems.GMAPS, TechItems.PYTHON , TechItems.JUPYTER_LAB ],
     gh_link: "https://github.com/Benjamincf0/learning",
-    description: `I used bixi's open data in combination with the google maps routes api to guess the paths taken by bixi riders, and plot them into a nice heatmap. Take a look at the notebooks if you like :)`,
+    description: (
+      <>I used bixi's <strong>open data</strong> in combination with the <strong>google maps routes api</strong> to guess the paths taken by bixi riders, and plot them into a nice <strong>heatmap</strong>. Take a look at the notebooks if you like :)</>
+    ),
     visual_link: "./projects/biximap.png",
   },
   {
@@ -156,7 +155,9 @@ Cool sound effects added to the robot to give a nice ambiance when the robot is 
     tags: [ TagItems.PERSONAL_PROJECT ],
     stack: [ TechItems.PYTHON , TechItems.JUPYTER_LAB, TechItems.LABEL_STUDIO ],
     gh_link: "https://github.com/Benjamincf0/plushie_detector",
-    description: `Trained a YOLO model to detect different plushies by creating my own custom labelled dataset in label studio.`,
+    description: (
+      <>Trained a <strong>YOLO</strong> model to detect different plushies by creating my own <strong>custom labelled dataset</strong> in <strong>label studio</strong>.</>
+    ),
     visual_link: "./projects/example_segmentation.png",
   },
 ];
@@ -173,7 +174,7 @@ interface ProjectCardProps {
   stack: TechStackData[];
   gh_link?: string;
   live_link?: string;
-  description: string;
+  description: ReactNode;
   visual_link: string;
 }
 

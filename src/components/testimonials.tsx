@@ -1,13 +1,12 @@
+import type { ReactNode } from "react";
 import "#styles/testimonials.css";
 
 const testimonials = [
   {
     author: "Alexandru Ciobanu",
-    message: `It was a pleasure to work with Ben.
-
-He is intrinsically motivated, curious, and capable of absorbing, and quickly organizing vast amounts of technical information, including research literature.  
-
-He is thorough and attentive to detail, but also productive. He is unafraid of working on complex systems, and helped us advance, significantly, several such projects.`,
+    message: (
+      <>It was a pleasure to work with Ben. He is <strong>intrinsically motivated</strong>, curious, and capable of absorbing, and quickly organizing vast amounts of technical information, including research literature. He is <strong>thorough and attentive to detail</strong>, but also <strong>productive</strong>. He is unafraid of working on <strong>complex systems</strong>, and helped us advance, significantly, several such projects.</>
+    ),
   },
 //   {
 //     author: "Bob ",
@@ -28,7 +27,7 @@ He is thorough and attentive to detail, but also productive. He is unafraid of w
 
 interface Testimonial {
   author: string;
-  message: string;
+  message: ReactNode;
 }
 
 export default function Testimonials() {
