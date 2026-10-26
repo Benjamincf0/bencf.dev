@@ -24,4 +24,20 @@ export const contributions: ContributionData[] = [
     deletions: 0,
     comments: 10,
   },
+  {
+    url: "https://github.com/pyvista/pyvista/pull/8652",
+    title: (
+      <>Avoid RGBA-&gt;RGB stride copy in <code>Plotter.image</code></>
+    ),
+    description: (
+      <>
+        Improved <code>Plotter.image</code> performance by requesting RGB output directly
+        instead of slicing an RGBA image. Ensured image buffers are contiguous for
+        downstream processing and added regression tests for RGB and RGBA output.
+      </>
+    ),
+    additions: 28,
+    deletions: 9,
+    comments: 5,
+  },
 ];
