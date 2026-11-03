@@ -10,6 +10,11 @@ export default function Hero() {
   useEffect(() => {
     const pointer = { x: 0, y: 0 };
     const tilt = { x: 0, y: 0 };
+    const pointerNdc = new THREE.Vector2();
+    const pointerRaycaster = new THREE.Raycaster();
+    const distortionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.3);
+    const distortionWorldCenter = new THREE.Vector3();
+    const distortionLocalCenter = new THREE.Vector3();
     let renderer: THREE.WebGPURenderer | undefined;
     let rendererInitialized = false;
     let active = true;
@@ -77,7 +82,6 @@ export default function Hero() {
       renderer.setAnimationLoop(() => {
         resizeRenderer();
 
-        distortCenter.value.set(0.5 - pointer.x * camera.aspect, 0.3, pointer.y);
         const progress = Math.min(clock.getElapsedTime(), introDuration) / introDuration;
         const position = cameraPath.getPointAt(1 - (progress - 1) ** 4);
         tilt.x = THREE.MathUtils.lerp(tilt.x, pointer.x, 0.05);
@@ -92,6 +96,15 @@ export default function Hero() {
         position.applyAxisAngle(orbitRight, tilt.y * orbitRange);
         camera.position.copy(position);
         camera.lookAt(lookAtTarget);
+
+        pointerNdc.set(pointer.x, -pointer.y);
+        pointerRaycaster.setFromCamera(pointerNdc, camera);
+        if (pointerRaycaster.ray.intersectPlane(distortionPlane, distortionWorldCenter)) {
+          splats.worldToLocal(
+            distortionLocalCenter.copy(distortionWorldCenter),
+          );
+          distortCenter.value.copy(distortionLocalCenter);
+        }
 
         renderer.render(scene, camera);
       });
