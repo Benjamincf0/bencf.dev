@@ -2,7 +2,12 @@ import { useEffect, useRef } from "react";
 import "#styles/hero.css";
 import * as THREE from "three/webgpu";
 import { SPZLoader } from "three/addons/loaders/SPZLoader.js";
-import { GaussianSplat, distortCenter } from "../GaussianSplat.js";
+import {
+  GaussianSplat,
+  distortCenter,
+  giggleCenter,
+  giggleStrength,
+} from "../GaussianSplat.js";
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -11,10 +16,13 @@ export default function Hero() {
     const pointer = { x: 0, y: 0 };
     const tilt = { x: 0, y: 0 };
     const pointerNdc = new THREE.Vector2();
+    const clickNdc = new THREE.Vector2();
     const pointerRaycaster = new THREE.Raycaster();
     const distortionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.3);
     const distortionWorldCenter = new THREE.Vector3();
     const distortionLocalCenter = new THREE.Vector3();
+    let gigglePending = false;
+    let giggleStartedAt = -Infinity;
     let renderer: THREE.WebGPURenderer | undefined;
     let rendererInitialized = false;
     let active = true;
@@ -24,6 +32,15 @@ export default function Hero() {
       pointer.y = (event.clientY / window.innerHeight) * 2 - 1;
     };
     window.addEventListener("mousemove", onMouseMove);
+
+    const onClick = (event: MouseEvent) => {
+      clickNdc.set(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        1 - (event.clientY / window.innerHeight) * 2,
+      );
+      gigglePending = true;
+    };
+    window.addEventListener("click", onClick);
 
     async function initializeScene() {
       const canvas = canvasRef.current;
@@ -106,6 +123,23 @@ export default function Hero() {
           distortCenter.value.copy(distortionLocalCenter);
         }
 
+        if (gigglePending) {
+          pointerRaycaster.setFromCamera(clickNdc, camera);
+          if (pointerRaycaster.ray.intersectPlane(distortionPlane, distortionWorldCenter)) {
+            splats.worldToLocal(
+              distortionLocalCenter.copy(distortionWorldCenter),
+            );
+            giggleCenter.value.copy(distortionLocalCenter);
+            giggleStartedAt = clock.getElapsedTime();
+          }
+          gigglePending = false;
+        }
+        const giggleElapsed = clock.getElapsedTime() - giggleStartedAt;
+        giggleStrength.value =
+          giggleElapsed < 0.5
+            ? Math.sin(giggleElapsed * 32) * 0.1 * Math.exp(-giggleElapsed * 8)
+            : 0;
+
         renderer.render(scene, camera);
       });
     }
@@ -115,6 +149,7 @@ export default function Hero() {
     return () => {
       active = false;
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("click", onClick);
       if (rendererInitialized) void renderer?.dispose();
     };
   }, []);

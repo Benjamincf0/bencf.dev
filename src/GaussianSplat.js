@@ -87,6 +87,8 @@ const _vector = /*@__PURE__*/ new Vector3();
 export const distortCenter = uniform(new Vector3(0, 0, 0)); // model space
 export const distortRadius = uniform(0.3);
 export const distortStrength = uniform(0.2);
+export const giggleCenter = uniform(new Vector3(0, 0, 0)); // model space
+export const giggleStrength = uniform(0);
 
 /**
  * A minimal renderer for 3D Gaussian splat geometry.
@@ -962,6 +964,16 @@ function createMaterialNodes(buffers, sort, localCameraPosition) {
       const falloff = smoothstep(distortRadius, 0, dist).toVar("falloff"); // 1 at center, 0 at radius
       const dir = delta.div(max(dist, 0.0001));
       center.addAssign(dir.mul(falloff).mul(distortStrength));
+
+      const giggleDelta = center.sub(giggleCenter).toVar("giggleDelta");
+      const giggleDistance = length(giggleDelta).toVar("giggleDistance");
+      const giggleFalloff = smoothstep(0.5, 0, giggleDistance).toVar(
+        "giggleFalloff",
+      );
+      const giggleDirection = giggleDelta.div(max(giggleDistance, 0.0001));
+      center.addAssign(
+        giggleDirection.mul(giggleFalloff).mul(giggleStrength),
+      );
 
       const covA = buffers.covarianceARead.element(splatIndex).toVar("covA");
       const covB = buffers.covarianceBRead.element(splatIndex).toVar("covB");
