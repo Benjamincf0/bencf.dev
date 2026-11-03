@@ -45,8 +45,9 @@ export default function Hero() {
     async function initializeScene() {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      renderer = new THREE.WebGPURenderer({ canvas });
+      renderer = new THREE.WebGPURenderer({ canvas, alpha: true });
       await renderer.init();
+      renderer.setClearColor(0x000000, 0);
       rendererInitialized = true;
       if (!active) {
         void renderer.dispose();
