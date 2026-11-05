@@ -1,0 +1,142 @@
+.hero-chat-anchor {
+  position: absolute;
+  z-index: 3;
+  top: 23%;
+  left: calc(50% + 25vh);
+  width: min(360px, calc(100% - 40px));
+  min-height: 48px;
+  transform: translate(-50%, -100%);
+}
+
+.hero-chat {
+  --chat-surface-opacity: 0.55;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.hero-chat:hover {
+  --chat-surface-opacity: 0.6;
+}
+
+.hero-chat:focus-within {
+  --chat-surface-opacity: 0.65;
+}
+
+.hero-chat[hidden] {
+  display: none;
+}
+
+.hero-chat input {
+  box-sizing: border-box;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 999px;
+  color: #f5f6f7;
+  caret-color: #f5f6f7;
+  background: rgba(23, 25, 28, var(--chat-surface-opacity));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  font-size: 14px;
+  transition: background-color 180ms ease;
+}
+
+.hero-chat input::placeholder {
+  color: #e1e5e9;
+}
+
+.hero-chat input:focus {
+  outline: none;
+}
+
+.hero-chat input::selection {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hero-chat button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #f5f6f7;
+  background: rgba(23, 25, 28, var(--chat-surface-opacity));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition: background-color 180ms ease, color 150ms ease;
+}
+
+.hero-chat button:disabled {
+  color: rgba(245, 246, 247, 0.4);
+  cursor: default;
+}
+
+.hero-chat button:hover:enabled,
+.hero-chat button:focus-visible {
+  outline: none;
+}
+
+.hero-chat button svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-chat__status {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 17px;
+  color: #62666b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Desktop controls are drawn in WebGPU; retain the native form for keyboard input. */
+@media (min-width: 801px) {
+  .hero-chat {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 800px) {
+  .hero-chat-anchor {
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    width: min(360px, 100%);
+    transform: none;
+  }
+
+  .hero-chat input {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-chat input,
+  .hero-chat button {
+    transition: none;
+  }
+}

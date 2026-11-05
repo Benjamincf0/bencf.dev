@@ -28,6 +28,10 @@
     justify-content: center;
   }
   @media screen and (max-width: 800px) {
+    flex-direction: column;
+    gap: 32px;
+    padding: 36px 24px 56px;
+
     .canvas_container {
       display: None;
     }
