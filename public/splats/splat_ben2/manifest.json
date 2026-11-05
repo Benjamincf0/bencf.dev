@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "source": "splat_ben2.spz",
+  "sourceBytes": 6528716,
+  "totalPoints": 337805,
+  "shDegree": 3,
+  "fractions": [
+    0.02,
+    0.04,
+    0.08,
+    0.16,
+    0.28,
+    0.42
+  ],
+  "chunks": [
+    {
+      "url": "chunk-00.spz",
+      "points": 6756,
+      "bytes": 154543,
+      "cumulativePoints": 6756
+    },
+    {
+      "url": "chunk-01.spz",
+      "points": 13512,
+      "bytes": 305871,
+      "cumulativePoints": 20268
+    },
+    {
+      "url": "chunk-02.spz",
+      "points": 27025,
+      "bytes": 599913,
+      "cumulativePoints": 47293
+    },
+    {
+      "url": "chunk-03.spz",
+      "points": 54049,
+      "bytes": 1183836,
+      "cumulativePoints": 101342
+    },
+    {
+      "url": "chunk-04.spz",
+      "points": 94585,
+      "bytes": 2047044,
+      "cumulativePoints": 195927
+    },
+    {
+      "url": "chunk-05.spz",
+      "points": 141878,
+      "bytes": 3035817,
+      "cumulativePoints": 337805
+    }
+  ]
+}
