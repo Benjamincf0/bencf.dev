@@ -107,13 +107,15 @@ export default function Hero() {
       const viewDirection = new THREE.Vector3();
       const orbitRight = new THREE.Vector3();
       const orbitRange = 0.4;
+      let previousElapsed = 0;
 
       const animate = () => {
         if (!splats) return;
         resizeRenderer();
 
         const elapsed = clock.getElapsedTime();
-        splats.revealTime.value = elapsed;
+        splats.advanceReveal(elapsed - previousElapsed);
+        previousElapsed = elapsed;
         const progress = Math.min(elapsed, introDuration) / introDuration;
         const position = cameraPath.getPointAt(1 - (progress - 1) ** 4);
         tilt.x = THREE.MathUtils.lerp(tilt.x, pointer.x, 0.05);
@@ -166,7 +168,11 @@ export default function Hero() {
         try {
           if (!active) return;
           if (!splats) {
-            splats = new GaussianSplat(geometry, { capacity: totalPoints, revealDuration: 0.35 });
+            splats = new GaussianSplat(geometry, {
+              capacity: totalPoints,
+              revealDuration: 1.1,
+              revealStagger: 3,
+            });
             splats.translateZ(0.1);
             scene.add(splats);
             clock.start();

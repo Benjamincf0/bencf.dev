@@ -115,12 +115,14 @@ class GaussianSplat extends Mesh {
    * @param {Object} [options] - Options.
    * @param {boolean} [options.autoSort=true] - Whether to sort automatically in `onBeforeRender`.
    * @param {number} [options.capacity] - Reserved space for incoming batches.
-   * @param {number} [options.revealDuration=0] - Fade-in time for each batch, in seconds.
+   * @param {number} [options.revealDuration=0] - Fade-in time for each splat, in seconds.
+   * @param {number} [options.revealStagger=0] - Seconds to spread the reveal of a fully buffered model.
    */
   constructor(splatGeometry, {
     autoSort = true,
     capacity = splatGeometry.getAttribute("position").count,
     revealDuration = 0,
+    revealStagger = 0,
   } = {}) {
     const count = splatGeometry.getAttribute("position").count;
     if (!Number.isSafeInteger(capacity) || capacity < count) {
@@ -166,6 +168,7 @@ class GaussianSplat extends Mesh {
             ? splatGeometry.getAttribute("sphericalHarmonics3").array
             : undefined,
       },
+      revealStagger * count / capacity,
     );
     const localCameraPosition = uniform(new Vector3());
     const sphericalHarmonicsComputeNode = createSphericalHarmonicsComputeNode(
@@ -206,6 +209,8 @@ class GaussianSplat extends Mesh {
     this.count = count;
     this.capacity = capacity;
     this.revealTime = revealTime;
+    this._revealStagger = revealStagger;
+    this._revealTail = revealStagger * count / capacity;
 
     /**
      * The source splat geometry.
@@ -296,6 +301,11 @@ class GaussianSplat extends Mesh {
     };
   }
 
+  /** Advances the reveal smoothly even after a stalled frame or a background tab. */
+  advanceReveal(delta) {
+    this.revealTime.value += Math.min(Math.max(delta, 0), 0.05);
+  }
+
   /** Appends a disjoint batch without replacing buffers or the draw material. */
   appendGeometry(batch) {
     const count = batch.getAttribute("position").count;
@@ -315,6 +325,10 @@ class GaussianSplat extends Mesh {
     for (const [name, target] of Object.entries(attributes)) {
       target.array.set(batch.getAttribute(name).array, start * target.itemSize);
     }
+    // Downloads can run ahead of the animation. Give each batch its own place
+    // on the timeline, while allowing late batches to start from the current time.
+    const revealStart = Math.max(this.revealTime.value, this._revealTail);
+    const revealSpan = this._revealStagger * count / this.capacity;
     writeStorageBuffers(
       this._buffers,
       batch.getAttribute("position").array,
@@ -322,7 +336,8 @@ class GaussianSplat extends Mesh {
       batch.getAttribute("color").array,
       count,
       start,
-      this.revealTime.value,
+      revealStart,
+      revealSpan,
     );
     for (const name of ["centerRead", "covarianceARead", "covarianceBRead", "colorRead"]) {
       markBufferRange(this._buffers[name].value, start, count);
@@ -336,6 +351,7 @@ class GaussianSplat extends Mesh {
     }
 
     this.count += count;
+    this._revealTail = revealStart + revealSpan;
     this.geometry.instanceCount = this.count;
     this._sort.count = this.count;
     // The sort buffers stay fixed; rebuild only the dispatch nodes for the new count.
@@ -760,6 +776,7 @@ function createStorageBuffers(
   covariances,
   colors,
   sphericalHarmonics,
+  revealSpan = 0,
 ) {
   const centerData = new Float32Array(count * 4);
   const covarianceAData = new Float32Array(count * 4);
@@ -798,11 +815,11 @@ function createStorageBuffers(
     buffers[`sphericalHarmonics${degree}Words`] = words;
   }
 
-  writeStorageBuffers(buffers, centers, covariances, colors, count);
+  writeStorageBuffers(buffers, centers, covariances, colors, count, 0, 0, revealSpan);
   return buffers;
 }
 
-function writeStorageBuffers(buffers, centers, covariances, colors, count, start = 0, revealTime = 0) {
+function writeStorageBuffers(buffers, centers, covariances, colors, count, start = 0, revealTime = 0, revealSpan = 0) {
   const centerData = buffers.centerRead.value.array;
   const covarianceAData = buffers.covarianceARead.value.array;
   const covarianceBData = buffers.covarianceBRead.value.array;
@@ -816,7 +833,10 @@ function writeStorageBuffers(buffers, centers, covariances, colors, count, start
     centerData[target4] = centers[i3];
     centerData[target4 + 1] = centers[i3 + 1];
     centerData[target4 + 2] = centers[i3 + 2];
-    centerData[target4 + 3] = revealTime;
+    // Source order is spatially clustered. A fixed, low-discrepancy phase
+    // distributes the fade across the portrait without noise between frames.
+    const phase = (Math.imul(start + i + 1, 0x9e3779b1) >>> 0) / 4294967296;
+    centerData[target4 + 3] = revealTime + phase * revealSpan;
 
     covarianceAData[target4] = covariances[i6];
     covarianceAData[target4 + 1] = covariances[i6 + 1];

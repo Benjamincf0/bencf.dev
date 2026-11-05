@@ -69,6 +69,43 @@ test("incompatible batches are rejected before modifying existing splats", () =>
   incoming.dispose();
 });
 
+test("bursty and delayed arrivals stagger new splats without restarting the existing reveal", () => {
+  const first = batch(Array.from({ length: 256 }, (_, i) => -1 - i / 256));
+  const mesh = new GaussianSplat(first, { capacity: 1024, revealDuration: 1.1, revealStagger: 4 });
+  const times = () => Array.from({ length: mesh.count }, (_, i) => mesh._buffers.centerRead.value.array[i * 4 + 3]);
+  const initialTimes = times();
+  const bins = new Set(initialTimes.map(time => Math.floor(time * 8)));
+  assert.equal(bins.size, 8, "The first sample should fade in across the entire stagger window.");
+  assert.ok(initialTimes.every(time => time >= 0 && time < 1));
+
+  mesh.revealTime.value = 0.1;
+  mesh.appendGeometry(first);
+  assert.deepEqual(times().slice(0, 256), initialTimes);
+  assert.ok(times().slice(256).every(time => time >= 1 && time < 2), "Fast arrivals should queue instead of revealing together.");
+  mesh.appendGeometry(first);
+  assert.ok(times().slice(512).every(time => time >= 2 && time < 3));
+
+  const beforeGap = times();
+  mesh.revealTime.value = 9;
+  mesh.appendGeometry(first);
+  assert.deepEqual(times().slice(0, 768), beforeGap);
+  assert.ok(times().slice(768).every(time => time >= 9 && time < 10), "Late data should begin a fresh fade, not arrive already visible.");
+  mesh.dispose();
+  first.dispose();
+});
+
+test("stalled frames and background tabs cannot skip through the reveal", () => {
+  const first = batch([-1]);
+  const mesh = new GaussianSplat(first, { revealDuration: 1.1 });
+  mesh.advanceReveal(1 / 60);
+  assert.equal(mesh.revealTime.value, 1 / 60);
+  mesh.advanceReveal(10);
+  assert.equal(mesh.revealTime.value, 1 / 60 + 0.05);
+  mesh.advanceReveal(-1);
+  assert.equal(mesh.revealTime.value, 1 / 60 + 0.05);
+  mesh.dispose();
+});
+
 test("the loader waits for the consumer before fetching another batch and stops on abort", async () => {
   const bytes = await readFile(new URL("../public/splats/splat_ben2/chunk-00.spz", import.meta.url));
   const requested = [];
