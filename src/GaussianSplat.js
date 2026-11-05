@@ -1,6 +1,7 @@
 import {
   Box3,
   BufferAttribute,
+  BufferGeometry,
   InstancedBufferGeometry,
   Matrix3,
   Matrix4,
@@ -113,13 +114,32 @@ class GaussianSplat extends Mesh {
    * @param {BufferGeometry} splatGeometry - The splat geometry to render. Higher-order spherical harmonics attributes must use packed `Uint32Array` words from {@link createGaussianSplatGeometry} (`SH_BAND_WORDS[ degree ]` words per splat, four clamped-byte coefficients per word).
    * @param {Object} [options] - Options.
    * @param {boolean} [options.autoSort=true] - Whether to sort automatically in `onBeforeRender`.
+   * @param {number} [options.capacity] - Reserved space for incoming batches.
+   * @param {number} [options.revealDuration=0] - Fade-in time for each batch, in seconds.
    */
-  constructor(splatGeometry, { autoSort = true } = {}) {
+  constructor(splatGeometry, {
+    autoSort = true,
+    capacity = splatGeometry.getAttribute("position").count,
+    revealDuration = 0,
+  } = {}) {
+    const count = splatGeometry.getAttribute("position").count;
+    if (!Number.isSafeInteger(capacity) || capacity < count) {
+      throw new Error("GaussianSplat capacity must fit the initial batch.");
+    }
+    // Reserve CPU and GPU storage once. Unloaded entries are never drawn or sorted.
+    if (capacity > count) {
+      const reserved = new BufferGeometry();
+      for (const [name, attribute] of Object.entries(splatGeometry.attributes)) {
+        const array = new attribute.array.constructor(capacity * attribute.itemSize);
+        array.set(attribute.array);
+        reserved.setAttribute(name, new BufferAttribute(array, attribute.itemSize, attribute.normalized));
+      }
+      splatGeometry = reserved;
+    }
     const positionAttribute = splatGeometry.getAttribute("position");
     const covarianceAttribute = splatGeometry.getAttribute("covariance");
     const colorAttribute = splatGeometry.getAttribute("color");
     const sphericalHarmonicsDegree = getSphericalHarmonicsDegree(splatGeometry);
-    const count = positionAttribute.count;
 
     if (splatGeometry.boundingBox === null) splatGeometry.computeBoundingBox();
     if (splatGeometry.boundingSphere === null)
@@ -127,7 +147,7 @@ class GaussianSplat extends Mesh {
 
     const geometry = createGeometry(count);
     const buffers = createStorageBuffers(
-      count,
+      capacity,
       positionAttribute.array,
       covarianceAttribute.array,
       colorAttribute.array,
@@ -152,14 +172,19 @@ class GaussianSplat extends Mesh {
       buffers,
       localCameraPosition,
     );
-    const sort = new CountingSort(count, {
+    if (sphericalHarmonicsComputeNode) sphericalHarmonicsComputeNode.count = count;
+    const sort = new CountingSort(capacity, {
       binCount: BIN_COUNT,
       workgroupSize: WORKGROUP_SIZE,
     });
+    sort.count = count;
+    const revealTime = uniform(0);
     const materialNodes = createMaterialNodes(
       buffers,
       sort,
       localCameraPosition,
+      revealTime,
+      revealDuration,
     );
     const material = createMaterial(
       materialNodes.vertexNode,
@@ -178,6 +203,9 @@ class GaussianSplat extends Mesh {
     this.isGaussianSplat = true;
 
     this.type = "GaussianSplat";
+    this.count = count;
+    this.capacity = capacity;
+    this.revealTime = revealTime;
 
     /**
      * The source splat geometry.
@@ -229,7 +257,7 @@ class GaussianSplat extends Mesh {
     const sortMatrix = this._sortMatrix;
     const sortDepthRange = this._sortDepthRange;
 
-    sort.setBinNode(() => {
+    this._binNode = () => {
       const center = centerRead.element(instanceIndex).xyz.toVar("center");
       const viewCenter = sortMatrix
         .mul(vec4(center, 1))
@@ -246,7 +274,8 @@ class GaussianSplat extends Mesh {
       const depthBin = uint(normalized.mul(BIN_COUNT - 1)).toVar("depthBin");
 
       return uint(BIN_COUNT - 1).sub(depthBin);
-    });
+    };
+    sort.setBinNode(this._binNode);
 
     this.onBeforeRender = (renderer, scene, camera) => {
       const vertexNode =
@@ -265,6 +294,63 @@ class GaussianSplat extends Mesh {
         this.updateSort(renderer, camera);
       }
     };
+  }
+
+  /** Appends a disjoint batch without replacing buffers or the draw material. */
+  appendGeometry(batch) {
+    const count = batch.getAttribute("position").count;
+    const start = this.count;
+    if (start + count > this.capacity) throw new Error("Splat batches exceed reserved capacity.");
+    const attributes = this.splatGeometry.attributes;
+    if (Object.keys(batch.attributes).length !== Object.keys(attributes).length) {
+      throw new Error("Splat batches must have matching attributes.");
+    }
+    for (const [name, target] of Object.entries(attributes)) {
+      const source = batch.getAttribute(name);
+      if (!source || source.count !== count || source.itemSize !== target.itemSize ||
+          source.normalized !== target.normalized || source.array.constructor !== target.array.constructor) {
+        throw new Error(`Incompatible splat batch attribute: ${name}`);
+      }
+    }
+    for (const [name, target] of Object.entries(attributes)) {
+      target.array.set(batch.getAttribute(name).array, start * target.itemSize);
+    }
+    writeStorageBuffers(
+      this._buffers,
+      batch.getAttribute("position").array,
+      batch.getAttribute("covariance").array,
+      batch.getAttribute("color").array,
+      count,
+      start,
+      this.revealTime.value,
+    );
+    for (const name of ["centerRead", "covarianceARead", "covarianceBRead", "colorRead"]) {
+      markBufferRange(this._buffers[name].value, start, count);
+    }
+    // WebGL can replace a storage array with a padded texture array on upload.
+    for (let degree = 1; degree <= this._buffers.sphericalHarmonicsDegree; degree++) {
+      const words = SH_BAND_WORDS[degree];
+      const attribute = this._buffers[`sphericalHarmonics${degree}Attribute`];
+      attribute.array.set(batch.getAttribute(`sphericalHarmonics${degree}`).array, start * words);
+      markBufferRange(attribute, start * words, count * words);
+    }
+
+    this.count += count;
+    this.geometry.instanceCount = this.count;
+    this._sort.count = this.count;
+    // The sort buffers stay fixed; rebuild only the dispatch nodes for the new count.
+    this._sort.setBinNode(this._binNode);
+    if (this._sphericalHarmonicsComputeNode) this._sphericalHarmonicsComputeNode.count = this.count;
+    this._sortInitialized = false;
+    this._sphericalHarmonicsInitialized = false;
+    this.boundingBox = null;
+    this.boundingSphere = null;
+  }
+
+  dispose() {
+    this.geometry.dispose();
+    this.material.dispose();
+    this.splatGeometry.dispose();
   }
 
   /**
@@ -325,7 +411,7 @@ class GaussianSplat extends Mesh {
 
     const positionAttribute = this.splatGeometry.getAttribute("position");
     const covarianceAttribute = this.splatGeometry.getAttribute("covariance");
-    const count = positionAttribute.count;
+    const count = this.count;
 
     for (let i = 0; i < count; i++) {
       const x = positionAttribute.getX(i);
@@ -362,7 +448,7 @@ class GaussianSplat extends Mesh {
 
     const positionAttribute = this.splatGeometry.getAttribute("position");
     const covarianceAttribute = this.splatGeometry.getAttribute("covariance");
-    const count = positionAttribute.count;
+    const count = this.count;
     const center = this.boundingSphere.center;
 
     let maxRadius = 0;
@@ -420,7 +506,7 @@ class GaussianSplat extends Mesh {
     const positionAttribute = this.splatGeometry.getAttribute("position");
     const covarianceAttribute = this.splatGeometry.getAttribute("covariance");
     const colorAttribute = this.splatGeometry.getAttribute("color");
-    const count = positionAttribute.count;
+    const count = this.count;
 
     for (let i = 0; i < count; i++) {
       computeRayIntersection(
@@ -681,31 +767,6 @@ function createStorageBuffers(
   const colorData = new Uint32Array(count);
   const sphericalHarmonicsDegree = sphericalHarmonics.degree;
 
-  for (let i = 0; i < count; i++) {
-    const i3 = i * 3;
-    const i4 = i * 4;
-    const i6 = i * 6;
-
-    centerData[i4] = centers[i3];
-    centerData[i4 + 1] = centers[i3 + 1];
-    centerData[i4 + 2] = centers[i3 + 2];
-
-    covarianceAData[i4] = covariances[i6];
-    covarianceAData[i4 + 1] = covariances[i6 + 1];
-    covarianceAData[i4 + 2] = covariances[i6 + 2];
-    covarianceAData[i4 + 3] = covariances[i6 + 3];
-
-    covarianceBData[i4] = covariances[i6 + 4];
-    covarianceBData[i4 + 1] = covariances[i6 + 5];
-
-    colorData[i] =
-      (colors[i4] |
-        (colors[i4 + 1] << 8) |
-        (colors[i4 + 2] << 16) |
-        (colors[i4 + 3] << 24)) >>>
-      0;
-  }
-
   const centerAttribute = new StorageBufferAttribute(centerData, 4);
   const covarianceAAttribute = new StorageBufferAttribute(covarianceAData, 4);
   const covarianceBAttribute = new StorageBufferAttribute(covarianceBData, 4);
@@ -737,7 +798,48 @@ function createStorageBuffers(
     buffers[`sphericalHarmonics${degree}Words`] = words;
   }
 
+  writeStorageBuffers(buffers, centers, covariances, colors, count);
   return buffers;
+}
+
+function writeStorageBuffers(buffers, centers, covariances, colors, count, start = 0, revealTime = 0) {
+  const centerData = buffers.centerRead.value.array;
+  const covarianceAData = buffers.covarianceARead.value.array;
+  const covarianceBData = buffers.covarianceBRead.value.array;
+  const colorData = buffers.colorRead.value.array;
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const i4 = i * 4;
+    const i6 = i * 6;
+    const target4 = (start + i) * 4;
+
+    centerData[target4] = centers[i3];
+    centerData[target4 + 1] = centers[i3 + 1];
+    centerData[target4 + 2] = centers[i3 + 2];
+    centerData[target4 + 3] = revealTime;
+
+    covarianceAData[target4] = covariances[i6];
+    covarianceAData[target4 + 1] = covariances[i6 + 1];
+    covarianceAData[target4 + 2] = covariances[i6 + 2];
+    covarianceAData[target4 + 3] = covariances[i6 + 3];
+
+    covarianceBData[target4] = covariances[i6 + 4];
+    covarianceBData[target4 + 1] = covariances[i6 + 5];
+
+    colorData[start + i] =
+      (colors[i4] |
+        (colors[i4 + 1] << 8) |
+        (colors[i4 + 2] << 16) |
+        (colors[i4 + 3] << 24)) >>>
+      0;
+  }
+}
+
+function markBufferRange(attribute, start, count) {
+  attribute.addUpdateRange(start * attribute.itemSize, count * attribute.itemSize);
+  attribute.needsUpdate = true;
+  // The WebGL fallback reads storage attributes through a texture.
+  if (attribute.pbo) attribute.pbo.needsUpdate = true;
 }
 
 function ensureSphericalHarmonicsContributionBuffer(buffers) {
@@ -945,7 +1047,7 @@ function createSphericalHarmonicsComputeNode(buffers, localCameraPosition) {
     .setName("GaussianSplatSphericalHarmonics");
 }
 
-function createMaterialNodes(buffers, sort, localCameraPosition) {
+function createMaterialNodes(buffers, sort, localCameraPosition, revealTime, revealDuration) {
   const splatUv = varyingProperty("vec2", "vSplatUv");
   const splatColor = varyingProperty("vec4", "vSplatColor");
 
@@ -954,7 +1056,8 @@ function createMaterialNodes(buffers, sort, localCameraPosition) {
       const splatIndex = sort.orderRead
         .element(instanceIndex)
         .toVar("splatIndex");
-      const center = buffers.centerRead.element(splatIndex).xyz.toVar("center");
+      const centerData = buffers.centerRead.element(splatIndex).toVar("centerData");
+      const center = centerData.xyz.toVar("center");
       // center.addAssign(
       //   vec3(0, sin(center.x.mul(3).add(splatTime)).mul(0.1), 0),
       // );
@@ -1074,7 +1177,10 @@ function createMaterialNodes(buffers, sort, localCameraPosition) {
         "alphaScale",
       );
 
-      splatColor.assign(vec4(rgb.clamp(0, 1), color.a.mul(alphaScale)));
+      const reveal = revealDuration > 0
+        ? smoothstep(0, revealDuration, revealTime.sub(centerData.w))
+        : float(1);
+      splatColor.assign(vec4(rgb.clamp(0, 1), color.a.mul(alphaScale).mul(reveal)));
 
       const halfTrace = a.add(c).mul(0.5).toVar("halfTrace");
       const radius = sqrt(
